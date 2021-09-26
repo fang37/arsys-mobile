@@ -2,16 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
-class Home extends StatefulWidget {
+class FacultyHome extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _FacultyHomeState createState() => _FacultyHomeState();
 }
 
-class _HomeState extends State<Home> {
+class _FacultyHomeState extends State<FacultyHome> {
   String name;
+  String role;
   @override
   void initState() {
     _loadUserData();
@@ -20,11 +22,13 @@ class _HomeState extends State<Home> {
 
   _loadUserData() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var user = jsonDecode(localStorage.getString('user'));
+    var user = jsonDecode(localStorage.getString('user')) ?? "";
+    var roles = localStorage.getString('roles');
 
     if (user != null) {
       setState(() {
         name = user['name'];
+        role = roles;
       });
     }
   }
@@ -41,7 +45,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Home'),
+        title: Text('FacultyHome'),
         backgroundColor: Colors.lightBlue,
         automaticallyImplyLeading: false,
         actions: [
@@ -60,16 +64,12 @@ class _HomeState extends State<Home> {
             children: [
               Row(
                 children: [
+                  Text('Hello, ', style: TextStyle(fontSize: 20)),
                   Text(
-                    'Hello, ',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  Text(
-                    '${name}',
+                    name,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+                  Text('  Roles: ' + role)
                 ],
               )
             ],
@@ -79,7 +79,7 @@ class _HomeState extends State<Home> {
       bottomNavigationBar: ConvexAppBar(
         backgroundColor: Colors.lightBlue,
         items: [
-          TabItem(icon: Icons.home, title: 'Home'),
+          TabItem(icon: Icons.home, title: 'FacultyHome'),
           TabItem(icon: Icons.supervised_user_circle, title: 'Supervise'),
           TabItem(icon: Icons.event, title: 'Event'),
           TabItem(icon: Icons.article, title: 'Review'),
@@ -98,7 +98,7 @@ class _HomeState extends State<Home> {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.remove('user');
       localStorage.remove('token');
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+      Get.toNamed('/login');
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:arsys/controllers/event_controller.dart';
-import 'package:arsys/controllers/user_controller.dart';
+import 'package:arsys/controllers/profile_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:arsys/views/user/login.dart';
@@ -17,10 +17,10 @@ class StudentHome extends StatefulWidget {
 
 class _StudentHomeState extends State<StudentHome> {
   final eventC = Get.find<EventController>();
-  final userC = Get.find<UserController>();
+  final profileC = Get.find<ProfileController>();
   @override
   void initState() {
-    userC.loadUserData();
+    profileC.profileUser();
     eventC.eventUser();
     // eventC.eventsUser();
     super.initState();
@@ -78,7 +78,7 @@ class _StudentHomeState extends State<StudentHome> {
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15)),
-                          child: FutureBuilder(
+                          child: FutureBuilder<dynamic>(
                               future: eventC.eventUser(),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
@@ -115,7 +115,7 @@ class _StudentHomeState extends State<StudentHome> {
                                                 40,
                                                 (index == 0)
                                                     ? Colors
-                                                        .deepOrangeAccent[100]
+                                                        .deepOrangeAccent[100]!
                                                     : Colors.lightBlueAccent),
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
@@ -137,9 +137,8 @@ class _StudentHomeState extends State<StudentHome> {
         backgroundColor: Colors.lightBlue,
         items: [
           TabItem(icon: Icons.home, title: 'Home'),
-          TabItem(icon: Icons.supervised_user_circle, title: 'Supervise'),
+          TabItem(icon: Icons.supervised_user_circle, title: 'Research'),
           TabItem(icon: Icons.event, title: 'Event'),
-          TabItem(icon: Icons.article, title: 'Review'),
           TabItem(icon: Icons.schedule, title: 'Lecture'),
         ],
         initialActiveIndex: _selectedNavbar,
@@ -149,6 +148,8 @@ class _StudentHomeState extends State<StudentHome> {
   }
 
   Future refreshEvent() async {
+    profileC.profileClear();
+    profileC.profileUser();
     eventC.event.clear();
     eventC.eventUser();
     eventC.events.clear();

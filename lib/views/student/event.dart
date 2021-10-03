@@ -16,8 +16,8 @@ class StudentEvent extends StatefulWidget {
 
 class _StudentEventState extends State<StudentEvent> {
   final eventC = Get.find<EventController>();
-  String name;
-  String role;
+  String name = "";
+  String role = "";
   @override
   void initState() {
     eventC.eventUser();
@@ -27,7 +27,7 @@ class _StudentEventState extends State<StudentEvent> {
 
   _loadUserData() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var user = jsonDecode(localStorage.getString('user')) ?? "";
+    var user = jsonDecode(localStorage.getString('user')!) ?? "";
     var roles = localStorage.getString('roles') ?? "";
 
     if (user != null) {
@@ -90,7 +90,7 @@ class _StudentEventState extends State<StudentEvent> {
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15)),
-                          child: FutureBuilder(
+                          child: FutureBuilder<dynamic>(
                               future: eventC.eventUser(),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
@@ -98,7 +98,7 @@ class _StudentEventState extends State<StudentEvent> {
                                   return Center(
                                     child: CircularProgressIndicator(),
                                   );
-                                } else if (snapshot.data.length == 0) {
+                                } else if (!snapshot.hasData) {
                                   return Expanded(
                                       child: Center(
                                           child: Text('No Event Applied')));
@@ -111,7 +111,7 @@ class _StudentEventState extends State<StudentEvent> {
                                             borderRadius:
                                                 BorderRadius.circular(15.0))),
                                     child: ListView.builder(
-                                        itemCount: snapshot.data.length,
+                                        itemCount: snapshot.data!.length,
                                         itemBuilder: (context, index) {
                                           return ListTile(
                                             title: Text(
@@ -127,7 +127,7 @@ class _StudentEventState extends State<StudentEvent> {
                                                 40,
                                                 (index == 0)
                                                     ? Colors
-                                                        .deepOrangeAccent[100]
+                                                        .deepOrangeAccent[100]!
                                                     : Colors.lightBlueAccent),
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
@@ -158,7 +158,7 @@ class _StudentEventState extends State<StudentEvent> {
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15)),
-                          child: FutureBuilder(
+                          child: FutureBuilder<dynamic>(
                               future: eventC.eventsUser(),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
@@ -171,8 +171,8 @@ class _StudentEventState extends State<StudentEvent> {
                                     child: Text('No Upcoming Event'),
                                   );
                                 } else {
-                                  print(snapshot.data[0].event_name);
-                                  print(snapshot.data.length);
+                                  // print(snapshot.data[0].event_name);
+                                  // print(snapshot.data!.length);
                                   return Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -344,9 +344,8 @@ class _StudentEventState extends State<StudentEvent> {
         backgroundColor: Colors.lightBlue,
         items: [
           TabItem(icon: Icons.home, title: 'Home'),
-          TabItem(icon: Icons.supervised_user_circle, title: 'Supervise'),
+          TabItem(icon: Icons.supervised_user_circle, title: 'Research'),
           TabItem(icon: Icons.event, title: 'Event'),
-          TabItem(icon: Icons.article, title: 'Review'),
           TabItem(icon: Icons.schedule, title: 'Lecture'),
         ],
         initialActiveIndex: _selectedNavbar,
@@ -364,14 +363,14 @@ class _StudentEventState extends State<StudentEvent> {
     setState(() {});
   }
 
-  void logout() async {
-    var res = await Network().getData('/logout');
-    var body = json.decode(res.body);
-    if (body['success']) {
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.remove('user');
-      localStorage.remove('token');
-      Get.toNamed('/login');
-    }
-  }
+  // void logout() async {
+  //   var res = await Network().getData('/logout');
+  //   var body = json.decode(res.body);
+  //   if (body['success']) {
+  //     SharedPreferences localStorage = await SharedPreferences.getInstance();
+  //     localStorage.remove('user');
+  //     localStorage.remove('token');
+  //     Get.toNamed('/login');
+  //   }
+  // }
 }

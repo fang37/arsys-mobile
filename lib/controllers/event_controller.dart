@@ -16,17 +16,17 @@ class EventController extends GetxController {
     4: 'Industrial Practic',
     5: 'Proposal'
   };
-  int id;
-  String event_id;
-  String event_code;
-  int event_type;
-  String application_deadline;
-  String event_date;
-  String draft_deadline;
-  int quota;
-  int current;
-  String creator;
-  int status;
+  int? id;
+  String? event_id;
+  String? event_code;
+  int? event_type;
+  String? application_deadline;
+  String? event_date;
+  String? draft_deadline;
+  int? quota;
+  int? current;
+  String creator = "";
+  int? status;
 
   void snackBarError(String msg) {
     Get.snackbar(
@@ -38,29 +38,93 @@ class EventController extends GetxController {
 
   Future eventUser() async {
     if (event.value.isEmpty) {
-      var res = await EventProvider().getEvent();
+      var res;
+      res = await EventProvider().getEvent();
       // print(res.bodyString);
       // print(res.body);
-      var body = json.decode(res.bodyString);
+      var body;
+      try {
+        body = await json.decode(res.bodyString);
+        // print(body); v
+      } catch (e) {
+        print(e);
+        return event;
+      }
 
-      if (body['success']) {
-        event.value.clear();
-        var bodies = body['event'];
-        if (bodies.length != 0) {
+      try {
+        if (body['success']) {
+          event.value.clear();
+          var bodies = body['event'];
+          if (bodies.length != 0) {
+            for (var b in bodies) {
+              id = b['id'];
+              event_id = b['event_id'];
+              event_code = b['event_code'] ?? "";
+              event_type = b['event_type'];
+              application_deadline = b['application_deadline'] ?? "";
+              event_date = b['event_date'] ?? "";
+              draft_deadline = b['draft_deadline'] ?? "";
+              quota = b['quota'];
+              current = b['current'];
+              creator = b['creator'] ?? "";
+              status = b['status'];
+
+              event.add(Event(
+                  id: id,
+                  event_id: event_id,
+                  event_name: event_name[event_type],
+                  event_code: event_code,
+                  event_type: event_type,
+                  application_deadline: application_deadline,
+                  event_date: event_date,
+                  draft_deadline: draft_deadline,
+                  quota: quota,
+                  current: current,
+                  creator: creator,
+                  status: status));
+            }
+          }
+        }
+        return (event);
+      } catch (e) {
+        print(e);
+      }
+    }
+    return (event);
+  }
+
+  Future eventsUser() async {
+    if (events.value.isEmpty) {
+      var res;
+      res = await EventProvider().getEvents();
+      // print(res.bodyString);
+      // print(res.body);
+      var body;
+      try {
+        body = await json.decode(res.bodyString);
+      } catch (e) {
+        print(e);
+        return events;
+      }
+
+      try {
+        if (body['success']) {
+          events.value.clear();
+          var bodies = body['event'];
           for (var b in bodies) {
             id = b['id'];
             event_id = b['event_id'];
-            event_code = b['event_code'];
+            event_code = b['event_code'] ?? "";
             event_type = b['event_type'];
             application_deadline = b['application_deadline'];
             event_date = b['event_date'];
             draft_deadline = b['draft_deadline'];
             quota = b['quota'];
             current = b['current'];
-            creator = b['creator'];
+            creator = b['creator'] ?? "";
             status = b['status'];
 
-            event.add(Event(
+            events.add(Event(
                 id: id,
                 event_id: event_id,
                 event_name: event_name[event_type],
@@ -75,53 +139,10 @@ class EventController extends GetxController {
                 status: status));
           }
         }
-        // print(event);
+        return (events);
+      } catch (e) {
+        print(e);
       }
-      return (event);
-    }
-    return (event);
-  }
-
-  Future eventsUser() async {
-    if (events.value.isEmpty) {
-      var res = await EventProvider().getEvents();
-      // print(res.bodyString);
-      // print(res.body);
-      var body = json.decode(res.bodyString);
-
-      if (body['success']) {
-        events.value.clear();
-        var bodies = body['event'];
-        for (var b in bodies) {
-          id = b['id'];
-          event_id = b['event_id'];
-          event_code = b['event_code'];
-          event_type = b['event_type'];
-          application_deadline = b['application_deadline'];
-          event_date = b['event_date'];
-          draft_deadline = b['draft_deadline'];
-          quota = b['quota'];
-          current = b['current'];
-          creator = b['creator'];
-          status = b['status'];
-
-          events.add(Event(
-              id: id,
-              event_id: event_id,
-              event_name: event_name[event_type],
-              event_code: event_code,
-              event_type: event_type,
-              application_deadline: application_deadline,
-              event_date: event_date,
-              draft_deadline: draft_deadline,
-              quota: quota,
-              current: current,
-              creator: creator,
-              status: status));
-        }
-        // print(event);
-      }
-      return (events);
     }
     return (events);
   }

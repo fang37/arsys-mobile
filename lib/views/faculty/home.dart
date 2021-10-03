@@ -12,8 +12,8 @@ class FacultyHome extends StatefulWidget {
 }
 
 class _FacultyHomeState extends State<FacultyHome> {
-  String name;
-  String role;
+  String? name;
+  String? role;
   @override
   void initState() {
     _loadUserData();
@@ -22,7 +22,8 @@ class _FacultyHomeState extends State<FacultyHome> {
 
   _loadUserData() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var user = jsonDecode(localStorage.getString('user')) ?? "";
+    var user;
+    user = jsonDecode(localStorage.getString('user')!) ?? "";
     var roles = localStorage.getString('roles');
 
     if (user != null) {
@@ -66,10 +67,10 @@ class _FacultyHomeState extends State<FacultyHome> {
                 children: [
                   Text('Hello, ', style: TextStyle(fontSize: 20)),
                   Text(
-                    name,
+                    name ?? "",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  Text('  Roles: ' + role)
+                  Text('  Roles: ' + (role ?? ""))
                 ],
               )
             ],

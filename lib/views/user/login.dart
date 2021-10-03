@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:arsys/controllers/auth_controller.dart';
+import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:arsys/network/api.dart';
@@ -12,23 +14,11 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  bool _isLoading = false;
+  final authC = Get.find<AuthController>();
   final _formKey = GlobalKey<FormState>();
   var email;
   var password;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  _showMsg(msg) {
-    final snackBar = SnackBar(
-      content: Text(msg),
-      action: SnackBarAction(
-        label: 'Close',
-        onPressed: () {
-          // Some code to undo the change!
-        },
-      ),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +34,7 @@ class _LoginState extends State<Login> {
                 fit: BoxFit.none,
                 repeat: ImageRepeat.repeat),
             gradient: LinearGradient(
-                colors: [Colors.lightBlue, Colors.lightBlueAccent[100]],
+                colors: [Colors.lightBlue, Colors.lightBlueAccent[100]!],
                 begin: FractionalOffset.bottomLeft,
                 end: FractionalOffset.topRight)),
         child: Stack(
@@ -126,7 +116,7 @@ class _LoginState extends State<Login> {
                                       fontWeight: FontWeight.normal),
                                 ),
                                 validator: (emailValue) {
-                                  if (emailValue.isEmpty) {
+                                  if (emailValue!.isEmpty) {
                                     return 'Please enter email';
                                   }
                                   email = emailValue;
@@ -150,7 +140,7 @@ class _LoginState extends State<Login> {
                                       fontWeight: FontWeight.normal),
                                 ),
                                 validator: (passwordValue) {
-                                  if (passwordValue.isEmpty) {
+                                  if (passwordValue!.isEmpty) {
                                     return 'Please enter password';
                                   }
                                   password = passwordValue;
@@ -162,8 +152,8 @@ class _LoginState extends State<Login> {
                                     left: 0, top: 10.0, right: 0),
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (_formKey.currentState.validate()) {
-                                      _login();
+                                    if (_formKey.currentState!.validate()) {
+                                      authC.login(email, password);
                                     }
                                   },
                                   style: ButtonStyle(
@@ -182,11 +172,13 @@ class _LoginState extends State<Login> {
                                     shadowColor: MaterialStateProperty.all(
                                         Colors.transparent),
                                   ),
-                                  child: Text(
-                                    _isLoading ? 'Proccessing...' : 'Login',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 16),
-                                  ),
+                                  child: Obx(() => Text(
+                                        authC.isLoading.value
+                                            ? 'Proccessing...'
+                                            : 'Login',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 16),
+                                      )),
                                 ),
                               ),
                             ],
@@ -205,32 +197,32 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void _login() async {
-    setState(() {
-      _isLoading = true;
-    });
-    var data = {'email': email, 'password': password};
+  // void _login() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //   var data = {'email': email, 'password': password};
 
-    var res = await Network().authData(data, '/login');
-    var body = json.decode(res.body);
+  //   var res = await Network().authData(data, '/login');
+  //   var body = json.decode(res.body);
 
-    if (body['success']) {
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.setString('token', json.encode(body['token']));
-      localStorage.setString('user', json.encode(body['user']));
-      localStorage.setString('roles', json.decode(json.encode(body['roles'])));
+  //   if (body['success']) {
+  //     SharedPreferences localStorage = await SharedPreferences.getInstance();
+  //     localStorage.setString('token', json.encode(body['token']));
+  //     localStorage.setString('user', json.encode(body['user']));
+  //     localStorage.setString('roles', json.decode(json.encode(body['roles'])));
 
-      if (body['roles'] == 'student') {
-        Get.toNamed('/student-home');
-      } else if (body['roles'] == 'faculty') {
-        Get.toNamed('/faculty-home');
-      }
-    } else {
-      _showMsg(body['message']);
-    }
+  //     if (body['roles'] == 'student') {
+  //       Get.offAndToNamed('/student-home');
+  //     } else if (body['roles'] == 'faculty') {
+  //       Get.offAndToNamed('/faculty-home');
+  //     }
+  //   } else {
+  //     _showMsg(body['message']);
+  //   }
 
-    setState(() {
-      _isLoading = false;
-    });
-  }
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+  // }
 }

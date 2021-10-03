@@ -1,16 +1,16 @@
 class Event {
-  int id;
-  String event_id;
-  String event_name;
-  String event_code = '-';
-  int event_type;
-  String application_deadline;
-  String event_date;
-  String draft_deadline;
-  int quota;
-  int current;
-  String creator;
-  int status;
+  int? id;
+  String? event_id;
+  String? event_name;
+  String? event_code = '-';
+  int? event_type;
+  String? application_deadline;
+  String? event_date;
+  String? draft_deadline;
+  int? quota;
+  int? current;
+  String? creator;
+  int? status;
 
   Event({
     this.id,

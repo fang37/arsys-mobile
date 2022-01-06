@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:arsys/models/research.dart';
+import 'package:arsys/network/api.dart';
 import 'package:arsys/network/event_provider.dart';
 import 'package:arsys/network/research_provider.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class ResearchController extends GetxController {
   Future researchUser() async {
     if (research.value.isEmpty) {
       var res;
-      res = await ResearchProvider().getResearch();
+      res = await Network().getResearch();
       print(res.bodyString);
       // print(res.body);
       var body;
@@ -163,9 +164,16 @@ class ResearchController extends GetxController {
 
   Icon approvalIcon(var decision) {
     if (decision == 1) {
-      return Icon(Icons.check_circle, size: 16, color: Color(0xFF26DE81));
+      return Icon(Icons.check_circle, size: 30, color: Colors.greenAccent);
     } else
-      return Icon(Icons.block, size: 16, color: Color(0xFFFC5C65));
+      return Icon(Icons.block, size: 30, color: Colors.redAccent);
+  }
+
+  Color timelineColor(int decision) {
+    if (decision == 1) {
+      return Colors.greenAccent;
+    } else
+      return Colors.redAccent;
   }
 
   void snackBarError(String msg) {

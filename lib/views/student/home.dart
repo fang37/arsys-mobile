@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:arsys/controllers/event_controller.dart';
+import 'package:arsys/controllers/fcm_controller.dart';
 import 'package:arsys/controllers/profile_controller.dart';
+import 'package:arsys/controllers/research_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
@@ -16,13 +19,18 @@ class StudentHome extends StatefulWidget {
 }
 
 class _StudentHomeState extends State<StudentHome> {
+  final fcmC = Get.find<FCMController>();
+  final researchC = Get.find<ResearchController>();
   final eventC = Get.find<EventController>();
   final profileC = Get.find<ProfileController>();
   @override
   void initState() {
+    researchC.researchUser();
     profileC.profileUser();
     eventC.eventUser();
-    // eventC.eventsUser();
+    eventC.eventsUser();
+    fcmC.sendToken();
+    fcmC.receiveNotification();
     super.initState();
   }
 
@@ -31,22 +39,22 @@ class _StudentHomeState extends State<StudentHome> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 1) {
-        Get.toNamed('/student-research');
+        Get.offAndToNamed('/student-research');
       }
       if (_selectedNavbar == 2) {
         Get.toNamed('/student-event');
       }
-      if (_selectedNavbar == 2) () => Get.toNamed('/student-event');
-      if (_selectedNavbar == 3) () => Get.toNamed('/student-event');
-      if (_selectedNavbar == 4) () => Get.toNamed('/student-event');
+      if (_selectedNavbar == 3) {
+        Get.toNamed('/student-lecture');
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBarBuilder(),
+      backgroundColor: Color(0xFFF0F9FE),
+      appBar: HomeAppBarBuilder(context),
       body: Platform.isIOS
           ? Container()
           : RefreshIndicator(
@@ -60,73 +68,93 @@ class _StudentHomeState extends State<StudentHome> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Applied Event',
-                          style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 20,
-                              fontFamily: 'Helvetica',
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Expanded(
+                      Flexible(
                         flex: 1,
                         child: Card(
-                          elevation: 4.0,
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          child: FutureBuilder<dynamic>(
-                              future: eventC.eventUser(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                } else if (snapshot.data.length == 0) {
-                                  return Expanded(
-                                      child: Center(
-                                          child: Text('No Event Applied')));
-                                } else {
-                                  // print(snapshot.data[0].event_name);
-                                  // print(snapshot.data.length);
-                                  return ClipPath(
-                                    clipper: ShapeBorderClipper(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15.0))),
-                                    child: ListView.builder(
-                                        itemCount: snapshot.data.length,
-                                        itemBuilder: (context, index) {
-                                          return ListTile(
-                                            title: Text(
-                                                snapshot.data[index].event_name,
-                                                style: TextStyle(
-                                                    fontFamily: 'Helvetica',
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.grey[800])),
-                                            subtitle: Text(snapshot
-                                                .data[index].event_date),
-                                            leading: eventC.iconBuilder(
-                                                snapshot.data[index].event_type,
-                                                40,
-                                                (index == 0)
-                                                    ? Colors
-                                                        .deepOrangeAccent[100]!
-                                                    : Colors.lightBlueAccent),
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(15)),
-                                            // tileColor: Colors.lightBlueAccent[100],
-                                          );
-                                        }),
-                                  );
-                                }
-                              }),
-                        ),
+                            elevation: 2.0,
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(0, 3, 0, 8),
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadiusDirectional.circular(10),
+                                // gradient: LinearGradient(
+                                //     colors: [
+                                //       Colors.lightBlueAccent,
+                                //       Color(0xFF0277E3)
+                                //     ],
+                                //     begin: Alignment.bottomLeft,
+                                //     end: Alignment.topRight)
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                          iconSize: 32,
+                                          color: Color(0xff3A4856),
+                                          onPressed: () {
+                                            Get.toNamed('/student-research');
+                                          },
+                                          icon: Icon(Icons.book_rounded)),
+                                      Text(
+                                        "Research",
+                                        style: TextStyle(
+                                            fontFamily: "OpenSans",
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xff3A4856)),
+                                      )
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                          iconSize: 32,
+                                          color: Color(0xff3A4856),
+                                          onPressed: () {
+                                            Get.toNamed('/student-event');
+                                          },
+                                          icon: Icon(Icons.event)),
+                                      Text(
+                                        "Event",
+                                        style: TextStyle(
+                                            fontFamily: "OpenSans",
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xff3A4856)),
+                                      )
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                          iconSize: 32,
+                                          color: Color(0xff3A4856),
+                                          onPressed: () {
+                                            Get.toNamed('/student-lecture');
+                                          },
+                                          icon: Icon(Icons.schedule)),
+                                      Text(
+                                        "Lecture",
+                                        style: TextStyle(
+                                            fontFamily: "OpenSans",
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xff3A4856)),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )),
                       ),
                     ],
                   ),
@@ -134,10 +162,16 @@ class _StudentHomeState extends State<StudentHome> {
               ),
             ),
       bottomNavigationBar: ConvexAppBar(
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.grey[100],
+        color: Colors.grey,
+        activeColor: Colors.lightBlueAccent,
+        top: 0,
+        elevation: 3,
+        style: TabStyle.flip,
+        height: 60,
         items: [
           TabItem(icon: Icons.home, title: 'Home'),
-          TabItem(icon: Icons.supervised_user_circle, title: 'Research'),
+          TabItem(icon: Icons.book_rounded, title: 'Research'),
           TabItem(icon: Icons.event, title: 'Event'),
           TabItem(icon: Icons.schedule, title: 'Lecture'),
         ],

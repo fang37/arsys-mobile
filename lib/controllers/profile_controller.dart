@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:arsys/models/event.dart';
 import 'package:arsys/models/profile.dart';
+import 'package:arsys/network/api.dart';
 import 'package:arsys/network/profile_provider.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
@@ -42,14 +43,13 @@ class ProfileController extends GetxController {
   Future profileUser() async {
     if (profile.id == null) {
       var res;
-      res = await ProfileProvider().getProfile();
+      res = await Network().getProfile();
       print(res.bodyString);
 
       // print(res.body);
       var body;
       try {
         body = await json.decode(res.bodyString);
-        // print("shafira");
         // print(body);
       } catch (e) {
         // print(e);

@@ -7,6 +7,7 @@ import 'package:arsys/network/api.dart';
 import 'package:arsys/views/faculty/home.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -38,56 +39,59 @@ class _LoginState extends State<Login> {
                 begin: FractionalOffset.bottomLeft,
                 end: FractionalOffset.topRight)),
         child: Stack(
+          alignment: AlignmentDirectional.center,
           children: <Widget>[
             Positioned(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+              top: MediaQuery.of(context).viewInsets.top +
+                  (MediaQuery.of(context).size.height * 0.10),
+              child: Container(
+                margin: EdgeInsets.only(bottom: 0),
                 child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(child: Container()),
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Ar",
-                                  style: TextStyle(
-                                    fontFamily: "Helvetica",
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 80,
-                                    color: Color(0xFFFFFFFF),
-                                  ),
-                                ),
-                                Text(
-                                  "Sys",
-                                  style: TextStyle(
-                                    fontFamily: "Helvetica",
-                                    fontSize: 80,
-                                    fontStyle: FontStyle.italic,
-                                    color: Color(0xFFFFFFFF),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              "Advanced Research Support System",
-                              style: TextStyle(
-                                fontFamily: "Helvetica",
-                                fontSize: 20,
-                                color: Color(0xFFFFFFFF),
-                              ),
-                            ),
-                          ],
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Ar",
+                          style: TextStyle(
+                            fontFamily: "Helvetica",
+                            fontWeight: FontWeight.bold,
+                            fontSize: 80,
+                            color: Color(0xFFFFFFFF),
+                          ),
                         ),
+                        Text(
+                          "Sys",
+                          style: TextStyle(
+                            fontFamily: "Helvetica",
+                            fontSize: 80,
+                            fontStyle: FontStyle.italic,
+                            color: Color(0xFFFFFFFF),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      "Advanced Research Support System",
+                      style: TextStyle(
+                        fontFamily: "Helvetica",
+                        fontSize: 20,
+                        color: Color(0xFFFFFFFF),
                       ),
                     ),
-                    Card(
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 50,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 220,
+                    width: MediaQuery.of(context).size.width,
+                    child: Card(
                       elevation: 4.0,
                       color: Colors.white,
                       margin: EdgeInsets.only(left: 20, right: 20),
@@ -181,16 +185,39 @@ class _LoginState extends State<Login> {
                                       )),
                                 ),
                               ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "For use ArSys Mobile, please do mobile activation ",
+                                      style: TextStyle(
+                                          color: Color(0xff3A4856),
+                                          fontFamily: "OpenSans"),
+                                    ),
+                                    InkWell(
+                                        onTap: () async {
+                                          await openURL(
+                                              'http://ee.upi.edu/arsys/arsys/user/mobile-activation');
+                                        },
+                                        child: Text("here",
+                                            style: TextStyle(
+                                                color: Colors.lightBlueAccent,
+                                                fontFamily: "OpenSans",
+                                                fontWeight: FontWeight.bold)))
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    Expanded(child: Container()),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -225,4 +252,10 @@ class _LoginState extends State<Login> {
   //     _isLoading = false;
   //   });
   // }
+}
+
+Future<void> openURL(String url,
+    {bool forceWebView = false, bool enableJavaScript = true}) async {
+  await launch(url,
+      forceWebView: forceWebView, enableJavaScript: enableJavaScript);
 }

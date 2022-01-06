@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:arsys/models/event.dart';
+import 'package:arsys/network/api.dart';
 import 'package:arsys/network/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EventController extends GetxController {
@@ -39,7 +41,7 @@ class EventController extends GetxController {
   Future eventUser() async {
     if (event.value.isEmpty) {
       var res;
-      res = await EventProvider().getEvent();
+      res = await Network().getEvent();
       // print(res.bodyString);
       // print(res.body);
       var body;
@@ -69,6 +71,34 @@ class EventController extends GetxController {
               creator = b['creator'] ?? "";
               status = b['status'];
 
+              if (event_date != null && event_date != "") {
+                var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+                var inputDate = inputFormat.parse(event_date!);
+
+                var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
+                var outputDate = outputFormat.format(inputDate);
+
+                event_date = outputDate.toString();
+              }
+              if (application_deadline != null && application_deadline != "") {
+                var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+                var inputDate = inputFormat.parse(application_deadline!);
+
+                var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
+                var outputDate = outputFormat.format(inputDate);
+
+                application_deadline = outputDate.toString();
+              }
+              if (draft_deadline != null && draft_deadline != "") {
+                var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+                var inputDate = inputFormat.parse(draft_deadline!);
+
+                var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
+                var outputDate = outputFormat.format(inputDate);
+
+                draft_deadline = outputDate.toString();
+              }
+
               event.add(Event(
                   id: id,
                   event_id: event_id,
@@ -96,7 +126,7 @@ class EventController extends GetxController {
   Future eventsUser() async {
     if (events.value.isEmpty) {
       var res;
-      res = await EventProvider().getEvents();
+      res = await Network().getEvents();
       // print(res.bodyString);
       // print(res.body);
       var body;
@@ -116,13 +146,41 @@ class EventController extends GetxController {
             event_id = b['event_id'];
             event_code = b['event_code'] ?? "";
             event_type = b['event_type'];
-            application_deadline = b['application_deadline'];
-            event_date = b['event_date'];
-            draft_deadline = b['draft_deadline'];
+            application_deadline = b['application_deadline'] ?? "";
+            event_date = b['event_date'] ?? "";
+            draft_deadline = b['draft_deadline'] ?? "";
             quota = b['quota'];
             current = b['current'];
             creator = b['creator'] ?? "";
             status = b['status'];
+
+            if (event_date != null && event_date != "") {
+              var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+              var inputDate = inputFormat.parse(event_date!);
+
+              var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
+              var outputDate = outputFormat.format(inputDate);
+
+              event_date = outputDate.toString();
+            }
+            if (application_deadline != null && application_deadline != "") {
+              var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+              var inputDate = inputFormat.parse(application_deadline!);
+
+              var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
+              var outputDate = outputFormat.format(inputDate);
+
+              application_deadline = outputDate.toString();
+            }
+            if (draft_deadline != null && draft_deadline != "") {
+              var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+              var inputDate = inputFormat.parse(draft_deadline!);
+
+              var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
+              var outputDate = outputFormat.format(inputDate);
+
+              draft_deadline = outputDate.toString();
+            }
 
             events.add(Event(
                 id: id,
@@ -181,9 +239,32 @@ class EventController extends GetxController {
 
   TextStyle headStyle() {
     return TextStyle(
-        color: Colors.grey[800],
+        color: Colors.white,
         fontSize: 15,
         fontFamily: "Helvetica",
         fontWeight: FontWeight.bold);
+  }
+
+  Color timelineColor(String date) {
+    if (date != null && date != "") {
+      var inputFormat = DateFormat('dd-MM-yyyy HH:mm');
+      var inputDate = inputFormat.parse(date!);
+
+      var outputFormat = DateFormat('dd-MM-yyyy');
+
+      var temp = outputFormat.parse(outputFormat.format(DateTime.now()));
+      var outputDate = outputFormat.parse(outputFormat.format(inputDate));
+
+      if (temp.compareTo(outputDate) < 0) {
+        return Colors.grey;
+      }
+      if (temp.compareTo(outputDate) == 0) {
+        return Colors.redAccent;
+      }
+      if (temp.compareTo(outputDate) > 0) {
+        return Colors.lightBlueAccent;
+      }
+    }
+    return Colors.grey;
   }
 }

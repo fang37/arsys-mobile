@@ -35,16 +35,16 @@ class _StudentResearchState extends State<StudentResearch> {
       if (_selectedNavbar == 2) {
         Get.toNamed('/student-event');
       }
-      if (_selectedNavbar == 2) () => Get.toNamed('/student-event');
-      if (_selectedNavbar == 3) () => Get.toNamed('/student-event');
-      if (_selectedNavbar == 4) () => Get.toNamed('/student-event');
+      if (_selectedNavbar == 3) {
+        Get.toNamed('/student-lecture');
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Color(0xFFF0F9FE),
       appBar: AppBarBuilder(),
       body: Platform.isIOS
           ? Container()
@@ -64,155 +64,168 @@ class _StudentResearchState extends State<StudentResearch> {
                         child: Text(
                           'Research',
                           style: TextStyle(
-                              color: Colors.black87,
+                              color: Color(0xff3A4856),
                               fontSize: 20,
-                              fontFamily: 'Helvetica',
+                              fontFamily: 'OpenSans',
                               fontWeight: FontWeight.bold),
                         ),
                       ),
-                      Expanded(
-                        child: FutureBuilder<dynamic>(
-                            future: researchC.researchUser(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              } else if (snapshot.data.length == 0) {
-                                return Expanded(
-                                    child: Center(child: Text('No Research')));
-                              } else {
-                                // print(snapshot.data[0].event_name);
-                                // print(snapshot.data.length);
-                                return ClipPath(
-                                  clipper: ShapeBorderClipper(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15.0))),
-                                  child: ListView.builder(
-                                      itemCount: snapshot.data.length,
-                                      itemBuilder: (context, index) {
-                                        return Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(5.0),
-                                            child: Card(
-                                              elevation: 4.0,
-                                              color: researchC.cardColorBuilder(
-                                                  snapshot.data[index]
-                                                      .milestone['milestone']),
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15)),
-                                              child: ClipPath(
-                                                clipper: ShapeBorderClipper(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15.0))),
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                      color: researchC
-                                                          .cardColorBuilder(
+                      Flexible(
+                        child: Card(
+                          elevation: 4.0,
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          child: FutureBuilder<dynamic>(
+                              future: researchC.researchUser(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else if (snapshot.data.length == 0) {
+                                  return Expanded(
+                                      child:
+                                          Center(child: Text('No Research')));
+                                } else {
+                                  // print(snapshot.data[0].event_name);
+                                  // print(snapshot.data.length);
+                                  return ClipPath(
+                                    clipper: ShapeBorderClipper(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15.0))),
+                                    child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: snapshot.data.length,
+                                        itemBuilder: (context, index) {
+                                          return Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
+                                              child: Card(
+                                                elevation: 0,
+                                                color: researchC
+                                                    .cardColorBuilder(snapshot
+                                                            .data[index]
+                                                            .milestone[
+                                                        'milestone']),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15)),
+                                                child: ClipPath(
+                                                  clipper: ShapeBorderClipper(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15.0))),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                        color: researchC
+                                                            .cardColorBuilder(snapshot
+                                                                    .data[index]
+                                                                    .milestone[
+                                                                'milestone'])
+                                                        // gradient:
+                                                        // LinearGradient(
+                                                        //     colors: [
+                                                        //   Colors.white,
+                                                        //   researchC.cardColorBuilder(
+                                                        //       snapshot.data[index]
+                                                        //               .milestone[
+                                                        //           'milestone'])
+                                                        // ],
+                                                        //     begin:
+                                                        //         FractionalOffset
+                                                        //             .centerLeft,
+                                                        //     end: FractionalOffset
+                                                        //         .centerRight)
+
+                                                        ),
+                                                    child: ListTile(
+                                                      onTap: () {
+                                                        Get.toNamed(
+                                                            '/student-research-detail',
+                                                            arguments: snapshot
+                                                                .data[index]);
+                                                      },
+                                                      contentPadding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(10, 10,
+                                                                  16, 10),
+                                                      isThreeLine: true,
+                                                      title: Text(
+                                                          snapshot.data[index]
+                                                              .research_name,
+                                                          style: TextStyle(
+                                                              fontSize: 24,
+                                                              fontFamily:
+                                                                  'OpenSans',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color: Colors
+                                                                  .white)),
+                                                      subtitle: Text(
+                                                        "${snapshot.data[index].milestone['milestone']} \n${snapshot.data[index].milestone['description'] ?? '-'}",
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'OpenSans'),
+                                                      ),
+                                                      leading:
+                                                          researchC.iconBuilder(
+                                                              snapshot
+                                                                  .data[index]
+                                                                  .research_type,
+                                                              65,
+                                                              index,
                                                               snapshot
                                                                       .data[index]
                                                                       .milestone[
-                                                                  'milestone'])
-                                                      // gradient:
-                                                      // LinearGradient(
-                                                      //     colors: [
-                                                      //   Colors.white,
-                                                      //   researchC.cardColorBuilder(
-                                                      //       snapshot.data[index]
-                                                      //               .milestone[
-                                                      //           'milestone'])
-                                                      // ],
-                                                      //     begin:
-                                                      //         FractionalOffset
-                                                      //             .centerLeft,
-                                                      //     end: FractionalOffset
-                                                      //         .centerRight)
-
-                                                      ),
-                                                  child: ListTile(
-                                                    onTap: () {
-                                                      Get.toNamed(
-                                                          '/student-research-detail',
-                                                          arguments: snapshot
-                                                              .data[index]);
-                                                    },
-                                                    contentPadding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(
-                                                                10, 10, 16, 10),
-                                                    isThreeLine: true,
-                                                    title: Text(
-                                                        snapshot.data[index]
-                                                            .research_name,
-                                                        style: TextStyle(
-                                                            fontSize: 24,
-                                                            fontFamily:
-                                                                'OpenSans',
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            color:
-                                                                Colors.white)),
-                                                    subtitle: Text(
-                                                      "${snapshot.data[index].milestone['milestone']} \n${snapshot.data[index].milestone['description'] ?? '-'}",
-                                                      style: TextStyle(
-                                                          fontFamily:
-                                                              'OpenSans'),
-                                                    ),
-                                                    leading:
-                                                        researchC.iconBuilder(
-                                                            snapshot.data[index]
-                                                                .research_type,
-                                                            65,
-                                                            index,
+                                                                  'milestone']),
+                                                      trailing: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Text(
                                                             snapshot.data[index]
                                                                     .milestone[
-                                                                'milestone']),
-                                                    trailing: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Text(
-                                                          snapshot.data[index]
-                                                                  .milestone[
-                                                              'phase'],
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                              fontFamily:
-                                                                  'OpenSans',
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                      ],
+                                                                'phase'],
+                                                            style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic,
+                                                                fontFamily:
+                                                                    'OpenSans',
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15)),
+                                                      // tileColor: Colors.lightBlueAccent[100],
                                                     ),
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15)),
-                                                    // tileColor: Colors.lightBlueAccent[100],
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      }),
-                                );
-                              }
-                            }),
+                                          );
+                                        }),
+                                  );
+                                }
+                              }),
+                        ),
                       )
                     ],
                   ),
@@ -220,10 +233,16 @@ class _StudentResearchState extends State<StudentResearch> {
               ),
             ),
       bottomNavigationBar: ConvexAppBar(
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.grey[100],
+        color: Colors.grey,
+        activeColor: Colors.lightBlueAccent,
+        top: 0,
+        elevation: 3,
+        style: TabStyle.flip,
+        height: 60,
         items: [
           TabItem(icon: Icons.home, title: 'Home'),
-          TabItem(icon: Icons.supervised_user_circle, title: 'Research'),
+          TabItem(icon: Icons.book_rounded, title: 'Research'),
           TabItem(icon: Icons.event, title: 'Event'),
           TabItem(icon: Icons.schedule, title: 'Lecture'),
         ],

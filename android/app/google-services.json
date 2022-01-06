@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "706073649385",
+    "project_id": "arsys-bf68d",
+    "storage_bucket": "arsys-bf68d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706073649385:android:044f14b3bfe1c3485b1078",
+        "android_client_info": {
+          "package_name": "com.example.arsys"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "706073649385-7ogg52lknre9k50bbs60k4p8ku1d2685.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfnmdosPOLrb8kTC9lQwng_A4d7u2koRA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "706073649385-7ogg52lknre9k50bbs60k4p8ku1d2685.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

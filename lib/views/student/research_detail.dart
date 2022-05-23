@@ -6,7 +6,6 @@ import 'package:arsys/controllers/research_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';

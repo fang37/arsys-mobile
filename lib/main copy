@@ -1,11 +1,9 @@
-import 'package:arsys/authentication/authentication_manager.dart';
+import 'package:arsys/controllers/auth_controller.dart';
 import 'package:arsys/controllers/event_controller.dart';
 import 'package:arsys/controllers/lecture_controller.dart';
 import 'package:arsys/controllers/research_controller.dart';
 import 'package:arsys/controllers/profile_controller.dart';
-import 'package:arsys/login/view/login_view.dart';
 import 'package:arsys/views/appbar.dart';
-import 'package:arsys/views/splash.dart';
 import 'package:arsys/views/student/all_lecture.dart';
 import 'package:arsys/views/student/event.dart';
 import 'package:arsys/views/student/lecture.dart';
@@ -21,7 +19,7 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:arsys/views/faculty/home.dart';
 import 'package:arsys/views/student/home.dart';
-// import 'package:arsys/login/view/login';
+import 'package:arsys/views/user/login.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -37,7 +35,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   await GetStorage.init();
-  print('Get Storage Finish Initiate');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -47,7 +44,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  // final authC = Get.put(AuthController());
+  final authC = Get.put(AuthController());
 
   // This widget is the root of your application.
   @override
@@ -59,58 +56,58 @@ class MyApp extends StatelessWidget {
     final lectureC = Get.put(LectureController());
     // final fcmC = Get.put(FCMController());
 
-    // authC.checkIfLoggedIn();
-    // print(authC.isAuth);
+    authC.checkIfLoggedIn();
+    print(authC.isAuth);
 
-    return GetMaterialApp(
-      // initialRoute: '/',
-      title: 'ArSys Mobile',
-      debugShowCheckedModeBanner: false,
-      getPages: [
-        GetPage(
-            name: '/faculty-home',
-            page: () => FacultyHome(),
-            transition: Transition.noTransition,
-            transitionDuration: Duration.zero),
-        GetPage(
-            name: '/student-home',
-            page: () => StudentHome(),
-            transition: Transition.noTransition,
-            transitionDuration: Duration.zero),
-        GetPage(
-            name: '/student-research',
-            page: () => StudentResearch(),
-            transition: Transition.noTransition,
-            transitionDuration: Duration.zero),
-        GetPage(
-            name: '/student-research-detail',
-            page: () => StudentResearchDetail(),
-            transition: Transition.noTransition,
-            transitionDuration: Duration.zero),
-        GetPage(
-            name: '/student-event',
-            page: () => StudentEvent(),
-            transition: Transition.noTransition,
-            transitionDuration: Duration.zero),
-        GetPage(
-            name: '/student-lecture',
-            page: () => Lecture(),
-            transition: Transition.noTransition,
-            transitionDuration: Duration.zero),
-        GetPage(
-            name: '/student-lectures',
-            page: () => AllLecture(),
-            transition: Transition.noTransition,
-            transitionDuration: Duration.zero),
-        GetPage(
-            name: '/student-profile',
-            page: () => StudentProfile(),
-            transition: Transition.noTransition,
-            transitionDuration: Duration.zero),
-        GetPage(name: '/login', page: () => LoginView()),
-      ],
-      home: SplashView(),
-    );
+    return Obx(() => GetMaterialApp(
+          initialRoute: '/',
+          title: 'ArSys Mobile',
+          debugShowCheckedModeBanner: false,
+          getPages: [
+            GetPage(
+                name: '/faculty-home',
+                page: () => FacultyHome(),
+                transition: Transition.noTransition,
+                transitionDuration: Duration.zero),
+            GetPage(
+                name: '/student-home',
+                page: () => StudentHome(),
+                transition: Transition.noTransition,
+                transitionDuration: Duration.zero),
+            GetPage(
+                name: '/student-research',
+                page: () => StudentResearch(),
+                transition: Transition.noTransition,
+                transitionDuration: Duration.zero),
+            GetPage(
+                name: '/student-research-detail',
+                page: () => StudentResearchDetail(),
+                transition: Transition.noTransition,
+                transitionDuration: Duration.zero),
+            GetPage(
+                name: '/student-event',
+                page: () => StudentEvent(),
+                transition: Transition.noTransition,
+                transitionDuration: Duration.zero),
+            GetPage(
+                name: '/student-lecture',
+                page: () => Lecture(),
+                transition: Transition.noTransition,
+                transitionDuration: Duration.zero),
+            GetPage(
+                name: '/student-lectures',
+                page: () => AllLecture(),
+                transition: Transition.noTransition,
+                transitionDuration: Duration.zero),
+            GetPage(
+                name: '/student-profile',
+                page: () => StudentProfile(),
+                transition: Transition.noTransition,
+                transitionDuration: Duration.zero),
+            GetPage(name: '/login', page: () => Login()),
+          ],
+          home: authC.isAuth() ? authC.homePage : Login(),
+        ));
   }
 }
 

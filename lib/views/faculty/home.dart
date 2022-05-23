@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';

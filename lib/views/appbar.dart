@@ -1,17 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:arsys/controllers/auth_controller.dart';
+import 'package:arsys/authentication/authentication_manager.dart';
 import 'package:arsys/controllers/event_controller.dart';
 import 'package:arsys/controllers/profile_controller.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 final profileC = Get.find<ProfileController>();
-final authC = Get.find<AuthController>();
+// final authC = Get.find<AuthController>();
+AuthenticationManager _authManager = Get.find();
 
 PreferredSize HomeAppBarBuilder(context) {
   return PreferredSize(
@@ -65,7 +66,7 @@ PreferredSize HomeAppBarBuilder(context) {
                           confirmTextColor: Colors.white,
                           radius: 15,
                           onConfirm: () {
-                            authC.logout();
+                            _authManager.logout();
                             Get.back();
                           });
                     },
@@ -117,19 +118,23 @@ PreferredSize HomeAppBarBuilder(context) {
                               color: Colors.white,
                             ),
                           );
-                        } else if (snapshot.hasData)
+                        } else if (snapshot.hasData) {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                profileC.profile.last_name ?? "",
-                                style: TextStyle(
-                                    height: 0.97,
-                                    fontSize: 30,
-                                    fontFamily: 'OpenSans',
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
+                              FittedBox(
+                                fit: BoxFit.fill,
+                                child: AutoSizeText(
+                                  profileC.profile.first_name ?? "",
+                                  style: TextStyle(
+                                      fontFamily: 'OpenSans',
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                  minFontSize: 30,
+                                  maxFontSize: 30,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                               Text(profileC.profile.role ?? "",
                                   style: TextStyle(
@@ -140,6 +145,7 @@ PreferredSize HomeAppBarBuilder(context) {
                                   ))
                             ],
                           );
+                        }
                         return Text("");
                       },
                     ),
@@ -224,12 +230,14 @@ AppBar AppBarBuilder() {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    profileC.profile.name ?? "",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'Helvetica',
-                      fontWeight: FontWeight.bold,
+                  FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      profileC.profile.name ?? "",
+                      style: TextStyle(
+                        fontFamily: 'Helvetica',
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   Text(profileC.profile.role ?? "",
@@ -266,7 +274,7 @@ AppBar AppBarBuilder() {
               confirmTextColor: Colors.white,
               radius: 15,
               onConfirm: () {
-                authC.logout();
+                _authManager.logout();
                 Get.back();
               });
 
@@ -331,7 +339,7 @@ AppBar SecondAppBarBuilder(String title) {
               confirmTextColor: Colors.white,
               radius: 15,
               onConfirm: () {
-                authC.logout();
+                _authManager.logout();
                 Get.back();
               });
 

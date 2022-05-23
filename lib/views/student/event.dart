@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:arsys/controllers/event_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';

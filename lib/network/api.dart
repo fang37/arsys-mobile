@@ -10,13 +10,13 @@ class Network extends GetConnect {
   _getToken() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      token = jsonDecode(localStorage.getString('token')!)['token'];
+      token = jsonDecode(localStorage.getString('token')!);
     } catch (e) {
       print(e);
     }
   }
 
-  final url = "http://192.168.1.6:80/api/arsys/";
+  final url = "http://192.168.1.5:80/api/arsys/";
 
   authData(data, apiUrl) async {
     var fullUrl = url + apiUrl;
@@ -25,7 +25,7 @@ class Network extends GetConnect {
           body: jsonEncode(data), headers: _setHeaders());
     } catch (e) {
       print(e);
-      print("error");
+      print("authData error");
       return false;
     }
   }
@@ -94,6 +94,7 @@ class Network extends GetConnect {
   Future<Response> getResearch() async {
     await _getToken();
     print("RESEARCH PROV");
+    print(token);
     return get(url + "research", headers: _setHeaders());
   }
 
@@ -101,13 +102,13 @@ class Network extends GetConnect {
   Future<Response> getLecture() async {
     await _getToken();
     print("LECTURE PROV");
-    return get("http://192.168.1.6:80/api/timetable/lecture",
+    return get("http://192.168.1.5:80/api/timetable/lecture",
         headers: _setHeaders());
   }
 
   Future<Response> getLectures() async {
     await _getToken();
-    return get("http://192.168.1.6:80/api/timetable/lectures",
+    return get("http://192.168.1.5:80/api/timetable/lectures",
         headers: _setHeaders());
   }
 

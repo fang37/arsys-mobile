@@ -43,10 +43,14 @@ class AuthController extends GetxController {
     var data = {'email': email, 'password': password};
 
     var res = await Network().authData(data, 'login');
-    if (res != false) {
+    print("RESULT AFTER LOGIN");
+    print(res.statusCode != 404);
+    if (res.statusCode == 200) {
       try {
         var body = json.decode(res.body);
         if (body['success']) {
+          print("Masuk ke success body login");
+          print(json.encode(body['token']));
           box.write('isAuth', true);
           authC.isAuth(true);
           SharedPreferences localStorage =

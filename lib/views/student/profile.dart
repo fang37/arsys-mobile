@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:arsys/authentication/authentication_manager.dart';
 import 'package:arsys/controllers/event_controller.dart';
 import 'package:arsys/controllers/profile_controller.dart';
 import 'package:arsys/controllers/research_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -21,6 +21,7 @@ class StudentProfile extends StatefulWidget {
 
 class _StudentProfileState extends State<StudentProfile> {
   final profileC = Get.find<ProfileController>();
+  AuthenticationManager _authManager = Get.find();
 
   @override
   void initState() {
@@ -116,7 +117,7 @@ class _StudentProfileState extends State<StudentProfile> {
                                       confirmTextColor: Colors.white,
                                       radius: 15,
                                       onConfirm: () {
-                                        authC.logout();
+                                        _authManager.logout();
                                         Get.back();
                                       });
                                 },
@@ -508,7 +509,7 @@ class _StudentProfileState extends State<StudentProfile> {
                                             return Column(
                                               children: [
                                                 Text(
-                                                  profileC.profile.last_name ??
+                                                  profileC.profile.first_name ??
                                                       "",
                                                   style: TextStyle(
                                                       height: 0.97,

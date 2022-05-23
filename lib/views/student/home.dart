@@ -6,7 +6,6 @@ import 'package:arsys/controllers/profile_controller.dart';
 import 'package:arsys/controllers/research_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -42,10 +41,10 @@ class _StudentHomeState extends State<StudentHome> {
         Get.offAndToNamed('/student-research');
       }
       if (_selectedNavbar == 2) {
-        Get.toNamed('/student-event');
+        Get.offAndToNamed('/student-event');
       }
       if (_selectedNavbar == 3) {
-        Get.toNamed('/student-lecture');
+        Get.offAndToNamed('/student-lecture');
       }
     });
   }

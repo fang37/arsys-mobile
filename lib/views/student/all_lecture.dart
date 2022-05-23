@@ -6,7 +6,6 @@ import 'package:arsys/controllers/research_controller.dart';
 import 'package:arsys/controllers/profile_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/views/user/login.dart';
 import 'package:arsys/network/api.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -824,18 +823,6 @@ class _AllLectureState extends State<AllLecture> {
                           children: [
                             Text(
                               "${snapshot.data[index].team_name}",
-                              style: TextStyle(
-                                  fontFamily: 'Helvetica',
-                                  color: Colors.black54),
-                            ),
-                            Text(
-                              "|",
-                              style: TextStyle(
-                                  fontFamily: 'Helvetica',
-                                  color: Colors.black54),
-                            ),
-                            Text(
-                              "${snapshot.data[index].class_code}",
                               style: TextStyle(
                                   fontFamily: 'Helvetica',
                                   color: Colors.black54),

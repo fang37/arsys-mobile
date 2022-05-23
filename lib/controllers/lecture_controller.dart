@@ -25,8 +25,6 @@ class LectureController extends GetxController {
   String? code; // subject[code]
   String? credit; // subject[credit]
   String? semester; // subject[semester]
-  String? class_code; // student[code]
-  int? grade; // student[grade]
   String? program_name; // program[abbrev]
   int? program_id; // program[abbrev]
   String? room; // room[name]
@@ -63,13 +61,11 @@ class LectureController extends GetxController {
               code = b['subject']['code'] ?? "";
               credit = b['subject']['credit'] ?? "";
               semester = b['subject']['semester'] ?? "";
-              class_code = b['student']['code'] ?? "";
-              grade = b['student']['grade'];
               program_name = b['program']['abbrev'] ?? "";
               program_id = b['program']['id'];
               room = (b['room_id'] != null) ? b['room']['name'] : "-";
               daytime = b['daytime'];
-              team = b['team'] ?? "";
+              team = b['teams'] ?? "";
 
               if (daytime != null) {
                 // daytime = daytime!.substring(
@@ -104,8 +100,6 @@ class LectureController extends GetxController {
                   code: code,
                   credit: credit,
                   semester: semester,
-                  class_code: class_code,
-                  grade: grade,
                   program_name: program_name,
                   program_id: program_id,
                   room: room,
@@ -157,13 +151,11 @@ class LectureController extends GetxController {
               code = b['subject']['code'] ?? "";
               credit = b['subject']['credit'] ?? "";
               semester = b['subject']['semester'] ?? "";
-              class_code = b['student']['code'] ?? "";
-              grade = b['student']['grade'];
               program_name = b['program']['abbrev'] ?? "";
               program_id = b['program']['id'];
               room = (b['room_id'] != null) ? b['room']['name'] : "-";
               daytime = b['daytime'];
-              team = b['team'] ?? "";
+              team = b['teams'] ?? "";
 
               if (daytime != null) {
                 // daytime = daytime!.substring(
@@ -198,8 +190,6 @@ class LectureController extends GetxController {
                   code: code,
                   credit: credit,
                   semester: semester,
-                  class_code: class_code,
-                  grade: grade,
                   program_name: program_name,
                   program_id: program_id,
                   room: room,

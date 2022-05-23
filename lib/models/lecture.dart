@@ -5,8 +5,6 @@ class Lecture {
   String? code; // subject[code]
   String? credit; // subject[credit]
   String? semester; // subject[semester]
-  String? class_code; // student[code]
-  int? grade; // student[grade]
   String? program_name; // program[abbrev]
   int? program_id; // program[abbrev]
   String? room; // room[name]
@@ -27,8 +25,6 @@ class Lecture {
     this.code,
     this.credit,
     this.semester,
-    this.class_code,
-    this.grade,
     this.program_name,
     this.program_id,
     this.room,

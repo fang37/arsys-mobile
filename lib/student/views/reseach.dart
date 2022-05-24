@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:arsys/controllers/event_controller.dart';
-import 'package:arsys/controllers/research_controller.dart';
-import 'package:arsys/controllers/profile_controller.dart';
+import 'package:arsys/student/controllers/event_controller.dart';
+import 'package:arsys/student/controllers/research_controller.dart';
+import 'package:arsys/student/controllers/student_controller.dart';
+import 'package:arsys/student/controllers/research_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/network/network.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';

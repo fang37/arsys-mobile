@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:arsys/controllers/event_controller.dart';
-import 'package:arsys/controllers/profile_controller.dart';
-import 'package:arsys/controllers/research_controller.dart';
+import 'package:arsys/student/controllers/research_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/network/network.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,9 +22,6 @@ class _StudentResearchDetailState extends State<StudentResearchDetail> {
   ScrollController scrollC = new ScrollController();
   @override
   void initState() {
-    // profileC.profileUser();
-    // researchC.eventUser();
-    // eventC.eventsUser();
     super.initState();
   }
 

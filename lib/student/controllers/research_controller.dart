@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:arsys/models/research.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/network/network.dart';
 import 'package:arsys/network/event_provider.dart';
 import 'package:arsys/network/research_provider.dart';
+import 'package:arsys/student/models/research.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';

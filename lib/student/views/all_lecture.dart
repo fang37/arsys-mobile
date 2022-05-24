@@ -1,31 +1,36 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:arsys/controllers/event_controller.dart';
-import 'package:arsys/controllers/lecture_controller.dart';
-import 'package:arsys/controllers/research_controller.dart';
-import 'package:arsys/controllers/profile_controller.dart';
+import 'package:arsys/student/controllers/lecture_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/network/network.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
-class Lecture extends StatefulWidget {
+class AllLecture extends StatefulWidget {
   @override
-  _LectureState createState() => _LectureState();
+  _AllLectureState createState() => _AllLectureState();
 }
 
-class _LectureState extends State<Lecture> {
+class _AllLectureState extends State<AllLecture> {
   final lectureC = Get.find<LectureController>();
   TextEditingController searchController = TextEditingController();
 
   String? semester = '';
   String? day = '';
+  int? prodi = 0;
+
+  var prodi_name = {
+    0: "Program",
+    1: "PTE",
+    2: "TE",
+    3: "PTOIR",
+  };
 
   @override
   void initState() {
-    lectureC.lectureUser();
+    lectureC.allLecture();
     super.initState();
   }
 
@@ -42,6 +47,9 @@ class _LectureState extends State<Lecture> {
       if (_selectedNavbar == 2) {
         Get.toNamed('/student-event');
       }
+      if (_selectedNavbar == 3) {
+        Get.toNamed('/student-lecture');
+      }
     });
   }
 
@@ -49,7 +57,7 @@ class _LectureState extends State<Lecture> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF0F9FE),
-      appBar: AppBarBuilder(),
+      appBar: SecondAppBarBuilder("All Lectures"),
       body: Platform.isIOS
           ? Container()
           : RefreshIndicator(
@@ -63,190 +71,170 @@ class _LectureState extends State<Lecture> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'LECTURE',
-                              style: TextStyle(
-                                  color: Color(0xff3A4856),
-                                  fontSize: 20,
-                                  fontFamily: 'OpenSans',
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          TextButton(
-                              onPressed: () {
-                                Get.toNamed('/student-lectures');
-                              },
-                              child: Text(
-                                'See All',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.lightBlueAccent),
-                              ))
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Container(
-                              margin: EdgeInsets.fromLTRB(8, 0, 0, 5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(50),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Container(
+                                margin: EdgeInsets.fromLTRB(8, 0, 0, 5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(50),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.grey,
+                                        blurRadius: 2,
+                                        spreadRadius: 1,
+                                        offset: Offset.fromDirection(1)),
+                                  ],
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 2,
-                                      spreadRadius: 1,
-                                      offset: Offset.fromDirection(1)),
-                                ],
-                              ),
-                              child: TextField(
-                                cursorHeight: 20,
-                                style: TextStyle(height: 0.8),
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
-                                controller: searchController,
-                                decoration: InputDecoration(
-                                    floatingLabelBehavior:
-                                        FloatingLabelBehavior.never,
-                                    labelText: "Search Lecture Name or Code",
-                                    prefixIcon: Icon(Icons.search),
-                                    suffixIcon: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          FocusScope.of(context).unfocus();
-                                          searchController.clear();
-                                        });
-                                      },
-                                      icon: Icon(Icons.clear),
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(50))),
-                                    filled: true,
-                                    fillColor: Colors.white),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(right: 8),
-                            color: Colors.transparent,
-                            child: FittedBox(
-                              child: IconButton(
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                        context: context,
-                                        builder: (context) {
-                                          return StatefulBuilder(builder:
-                                              (context,
-                                                  StateSetter modalstate) {
-                                            return Padding(
-                                              padding: EdgeInsets.only(
-                                                  bottom: MediaQuery.of(context)
-                                                      .viewInsets
-                                                      .bottom),
-                                              child: Container(
-                                                height: 100,
-                                                padding: EdgeInsets.fromLTRB(
-                                                    20, 20, 20, 30),
-                                                color: Colors.white,
-                                                child: ListView(
-                                                  shrinkWrap: true,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          'Filter',
-                                                          style: TextStyle(
-                                                              color: Color(
-                                                                  0xff3A4856),
-                                                              fontSize: 20,
-                                                              fontFamily:
-                                                                  'OpenSans',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              day = '';
-                                                              if (Get.isBottomSheetOpen !=
-                                                                  null) {
-                                                                Get.back();
-                                                              }
-                                                            });
-                                                          },
-                                                          icon: Icon(Icons
-                                                              .refresh_rounded),
-                                                          color: Colors
-                                                              .lightBlueAccent,
-                                                        )
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      'Day',
-                                                      style: TextStyle(
-                                                          color:
-                                                              Color(0xff3A4856),
-                                                          fontSize: 16,
-                                                          fontFamily:
-                                                              'OpenSans',
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    ElevatedButton(
-                                                      style: ElevatedButton.styleFrom(
-                                                          primary: Colors
-                                                              .lightBlueAccent,
-                                                          elevation: 0,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15))),
-                                                      child: Text(
-                                                        "Set",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontFamily:
-                                                                'Helvetica'),
-                                                      ),
-                                                      onPressed: () {
-                                                        if (Get.isBottomSheetOpen !=
-                                                            null) {
-                                                          setState(() {
-                                                            Get.back();
-                                                          });
-                                                        }
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          });
-                                        });
+                                child: TextField(
+                                  cursorHeight: 20,
+                                  style: TextStyle(height: 0.8),
+                                  onChanged: (value) {
+                                    setState(() {});
                                   },
-                                  icon: Icon(
-                                    Icons.menu_rounded,
-                                    size: 30,
-                                    color: Colors.grey,
-                                  )),
+                                  controller: searchController,
+                                  decoration: InputDecoration(
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.never,
+                                      labelText: "Search Lecture Name or Code",
+                                      prefixIcon: Icon(Icons.search),
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            FocusScope.of(context).unfocus();
+                                            searchController.clear();
+                                          });
+                                        },
+                                        icon: Icon(Icons.clear),
+                                      ),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(50))),
+                                      filled: true,
+                                      fillColor: Colors.white),
+                                ),
+                              ),
                             ),
-                          )
-                        ],
+                            Container(
+                              margin: EdgeInsets.only(right: 8),
+                              color: Colors.transparent,
+                              child: FittedBox(
+                                child: IconButton(
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                          context: context,
+                                          builder: (context) {
+                                            return StatefulBuilder(builder:
+                                                (context,
+                                                    StateSetter modalstate) {
+                                              return Padding(
+                                                padding: EdgeInsets.only(
+                                                    bottom:
+                                                        MediaQuery.of(context)
+                                                            .viewInsets
+                                                            .bottom),
+                                                child: Container(
+                                                  height: 100,
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      20, 20, 20, 30),
+                                                  color: Colors.white,
+                                                  child: ListView(
+                                                    shrinkWrap: true,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            'Filter',
+                                                            style: TextStyle(
+                                                                color: Color(
+                                                                    0xff3A4856),
+                                                                fontSize: 20,
+                                                                fontFamily:
+                                                                    'OpenSans',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          IconButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                day = '';
+                                                                if (Get.isBottomSheetOpen !=
+                                                                    null) {
+                                                                  Get.back();
+                                                                }
+                                                              });
+                                                            },
+                                                            icon: Icon(Icons
+                                                                .refresh_rounded),
+                                                            color: Colors
+                                                                .lightBlueAccent,
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Text(
+                                                        'Day',
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                0xff3A4856),
+                                                            fontSize: 16,
+                                                            fontFamily:
+                                                                'OpenSans',
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                            primary: Colors
+                                                                .lightBlueAccent,
+                                                            elevation: 0,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15))),
+                                                        child: Text(
+                                                          "Set",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontFamily:
+                                                                  'Helvetica'),
+                                                        ),
+                                                        onPressed: () {
+                                                          if (Get.isBottomSheetOpen !=
+                                                              null) {
+                                                            setState(() {
+                                                              Get.back();
+                                                            });
+                                                          }
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                          });
+                                    },
+                                    icon: Icon(
+                                      Icons.menu_rounded,
+                                      size: 30,
+                                      color: Colors.grey,
+                                    )),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                       Container(
                         height: 30,
@@ -259,6 +247,35 @@ class _LectureState extends State<Lecture> {
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
                               children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      side: BorderSide(
+                                          color: (prodi == 0)
+                                              ? Colors.grey
+                                              : Colors.lightBlueAccent),
+                                      primary: (prodi == 0)
+                                          ? Colors.white
+                                          : Colors.lightBlue[50],
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15))),
+                                  child: Text(
+                                    (prodi == 0)
+                                        ? 'Prodi'
+                                        : "${prodi_name[prodi]}",
+                                    style: TextStyle(
+                                        color: (prodi == 0)
+                                            ? Colors.grey
+                                            : Colors.lightBlue,
+                                        fontFamily: 'Helvetica'),
+                                  ),
+                                  onPressed: () {
+                                    prodiBottomModal(context);
+                                  },
+                                ),
+                                VerticalDivider(
+                                    color: Colors.transparent, width: 5),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                       side: BorderSide(
@@ -319,8 +336,11 @@ class _LectureState extends State<Lecture> {
                             ),
                             TextButton(
                                 onPressed: () {
-                                  if (semester != "" || day != "") {
+                                  if (prodi != 0 ||
+                                      semester != "" ||
+                                      day != "") {
                                     setState(() {
+                                      prodi = 0;
                                       semester = "";
                                       day = "";
                                     });
@@ -336,7 +356,7 @@ class _LectureState extends State<Lecture> {
                       ),
                       Expanded(
                         child: FutureBuilder<dynamic>(
-                            future: lectureC.lectureUser(),
+                            future: lectureC.allLecture(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -365,7 +385,11 @@ class _LectureState extends State<Lecture> {
                                                     .contains(semester) &&
                                                 snapshot.data[index].daytime
                                                     .toLowerCase()
-                                                    .contains(day)) {
+                                                    .contains(day) &&
+                                                (snapshot.data[index]
+                                                            .program_id ==
+                                                        prodi ||
+                                                    prodi == 0)) {
                                               return ListElement(
                                                   snapshot, index);
                                             }
@@ -382,7 +406,11 @@ class _LectureState extends State<Lecture> {
                                                     .contains(semester) &&
                                                 snapshot.data[index].daytime
                                                     .toLowerCase()
-                                                    .contains(day)) {
+                                                    .contains(day) &&
+                                                (snapshot.data[index]
+                                                            .program_id ==
+                                                        prodi ||
+                                                    prodi == 0)) {
                                               return ListElement(
                                                   snapshot, index);
                                             }
@@ -417,6 +445,111 @@ class _LectureState extends State<Lecture> {
         initialActiveIndex: _selectedNavbar,
         onTap: _changeSelectedNavBar,
       ),
+    );
+  }
+
+  Future<dynamic> prodiBottomModal(BuildContext context) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, StateSetter modalstate) {
+            return Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 30),
+                color: Colors.white,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Filter',
+                          style: TextStyle(
+                              color: Color(0xff3A4856),
+                              fontSize: 20,
+                              fontFamily: 'OpenSans',
+                              fontWeight: FontWeight.bold),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              prodi = 0;
+                              if (Get.isBottomSheetOpen != null) {
+                                Get.back();
+                              }
+                            });
+                          },
+                          icon: Icon(Icons.refresh_rounded),
+                          color: Colors.lightBlueAccent,
+                        )
+                      ],
+                    ),
+                    Text(
+                      'Prodi',
+                      style: TextStyle(
+                          color: Color(0xff3A4856),
+                          fontSize: 16,
+                          fontFamily: 'OpenSans',
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        prodiRadioBuilder(0, 'All', modalstate),
+                        prodiRadioBuilder(1, 'PTE', modalstate),
+                        prodiRadioBuilder(2, 'TE', modalstate),
+                        prodiRadioBuilder(3, 'PTOIR', modalstate),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+        },
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+        ),
+        clipBehavior: Clip.antiAliasWithSaveLayer);
+  }
+
+  Column prodiRadioBuilder(int val, String desc, var modalstate) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: (MediaQuery.of(context).size.width * 0.9) / 9,
+          child: Radio(
+              activeColor: Colors.lightBlueAccent,
+              value: val,
+              groupValue: prodi,
+              onChanged: (value) {
+                modalstate(() {
+                  prodi = value as int?;
+                  if (Get.isBottomSheetOpen != null) {
+                    setState(() {
+                      Get.back();
+                    });
+                  }
+                });
+              }),
+        ),
+        Text(
+          desc,
+          style: TextStyle(
+            color: Color(0xff3A4856),
+            fontSize: 20,
+            fontFamily: 'OpenSans',
+          ),
+        ),
+      ],
     );
   }
 

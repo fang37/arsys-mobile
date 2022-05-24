@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:arsys/models/event.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/student/models/event.dart';
+import 'package:arsys/network/network.dart';
 import 'package:arsys/network/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

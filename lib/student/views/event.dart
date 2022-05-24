@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:arsys/controllers/event_controller.dart';
+import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/network/network.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';

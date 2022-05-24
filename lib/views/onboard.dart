@@ -1,6 +1,6 @@
 import 'package:arsys/login/view/login_view.dart';
+import 'package:arsys/student/views/home.dart';
 import 'package:arsys/views/faculty/home.dart';
-import 'package:arsys/views/student/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';

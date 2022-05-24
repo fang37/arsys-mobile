@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:arsys/authentication/authentication_manager.dart';
-import 'package:arsys/controllers/event_controller.dart';
-import 'package:arsys/controllers/profile_controller.dart';
-import 'package:arsys/controllers/research_controller.dart';
+import 'package:arsys/student/controllers/student_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/network/network.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +18,7 @@ class StudentProfile extends StatefulWidget {
 }
 
 class _StudentProfileState extends State<StudentProfile> {
-  final profileC = Get.find<ProfileController>();
+  final profileC = Get.find<StudentController>();
   AuthenticationManager _authManager = Get.find();
 
   @override
@@ -184,8 +182,7 @@ class _StudentProfileState extends State<StudentProfile> {
                                                 physics:
                                                     BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.profile.first_name} ${profileC.profile.last_name}" ??
-                                                      "",
+                                                  profileC.getFullName(),
                                                   style: TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -226,8 +223,7 @@ class _StudentProfileState extends State<StudentProfile> {
                                                 physics:
                                                     BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.profile.student_number}" ??
-                                                      "",
+                                                  "${profileC.student.studentNumber}",
                                                   style: TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -268,8 +264,7 @@ class _StudentProfileState extends State<StudentProfile> {
                                                 physics:
                                                     BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.profile.role}" ??
-                                                      "",
+                                                  profileC.student.role,
                                                   style: TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -310,8 +305,7 @@ class _StudentProfileState extends State<StudentProfile> {
                                                 physics:
                                                     BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.profile.specialization}" ??
-                                                      "",
+                                                  "${profileC.student.specialization}",
                                                   style: TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -378,9 +372,9 @@ class _StudentProfileState extends State<StudentProfile> {
                                                   physics:
                                                       BouncingScrollPhysics(),
                                                   child: SelectableText(
-                                                    "${profileC.profile.supervisor['front_title']} ${profileC.profile.supervisor['first_name']} ${profileC.profile.supervisor['last_name']} ${profileC.profile.supervisor['rear_title']}" ??
-                                                        "",
-                                                    style: TextStyle(
+                                                    profileC
+                                                        .getSupervisorNameAndTitle(),
+                                                    style: const TextStyle(
                                                         color: Colors.lightBlue,
                                                         fontSize: 20,
                                                         fontFamily: 'Helvetica',
@@ -421,8 +415,7 @@ class _StudentProfileState extends State<StudentProfile> {
                                                 physics:
                                                     BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.profile.email}" ??
-                                                      "",
+                                                  "${profileC.student.email}",
                                                   style: TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -463,8 +456,7 @@ class _StudentProfileState extends State<StudentProfile> {
                                                 physics:
                                                     BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.profile.phone}" ??
-                                                      "",
+                                                  "${profileC.student.phone}",
                                                   style: TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -496,22 +488,22 @@ class _StudentProfileState extends State<StudentProfile> {
                                         size: 150,
                                       ),
                                       FutureBuilder(
-                                        future: profileC.profileUser(),
+                                        future: profileC.getProfile(),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                               ConnectionState.waiting) {
-                                            return Center(
+                                            return const Center(
                                               child: CircularProgressIndicator(
                                                 color: Color(0xff3A4856),
                                               ),
                                             );
-                                          } else if (snapshot.hasData)
+                                          } else if (snapshot.hasData) {
                                             return Column(
                                               children: [
                                                 Text(
-                                                  profileC.profile.first_name ??
+                                                  profileC.student.firstName ??
                                                       "",
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       height: 0.97,
                                                       fontSize: 30,
                                                       fontFamily: 'OpenSans',
@@ -521,7 +513,8 @@ class _StudentProfileState extends State<StudentProfile> {
                                                 ),
                                               ],
                                             );
-                                          return Text("");
+                                          }
+                                          return const Text("");
                                         },
                                       ),
                                     ],
@@ -557,7 +550,7 @@ class _StudentProfileState extends State<StudentProfile> {
 
   Future refreshResearch() async {
     profileC.profileClear();
-    profileC.profileUser();
+    profileC.getProfile();
     await Future.delayed(Duration(seconds: 2));
     // setState(() {});
   }

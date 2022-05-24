@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:arsys/controllers/fcm_controller.dart';
+import 'package:arsys/firebase/fcm_controller.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -30,7 +30,7 @@ class AuthenticationManager extends GetxController with CacheManager {
     removeRole();
     activeRole = "";
     isLogged.value = false;
-
+    Get.offNamedUntil('/', (route) => false);
     // await fcmC.removeToken();
   }
 

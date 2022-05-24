@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/network/network.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
@@ -52,7 +52,7 @@ class _FacultyHomeState extends State<FacultyHome> {
           IconButton(
             icon: Icon(Icons.power_settings_new),
             onPressed: () {
-              logout();
+              // logout();
             },
           )
         ],
@@ -89,16 +89,5 @@ class _FacultyHomeState extends State<FacultyHome> {
         onTap: _changeSelectedNavBar,
       ),
     );
-  }
-
-  void logout() async {
-    var res = await Network().getData('/logout');
-    var body = json.decode(res.body);
-    if (body['success']) {
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.remove('user');
-      localStorage.remove('token');
-      Get.toNamed('/login');
-    }
   }
 }

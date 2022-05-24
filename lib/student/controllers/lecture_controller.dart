@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:arsys/models/lecture.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/student/models/lecture.dart';
+import 'package:arsys/network/network.dart';
 import 'package:arsys/network/event_provider.dart';
 import 'package:arsys/network/lecture_provider.dart';
 import 'package:arsys/network/research_provider.dart';

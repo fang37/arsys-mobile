@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:arsys/network/api.dart';
-import 'package:arsys/views/faculty/home.dart';
-import 'package:arsys/views/student/home.dart';
+import 'package:arsys/network/network.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';

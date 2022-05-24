@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:arsys/controllers/event_controller.dart';
-import 'package:arsys/controllers/fcm_controller.dart';
-import 'package:arsys/controllers/profile_controller.dart';
-import 'package:arsys/controllers/research_controller.dart';
+import 'package:arsys/firebase/fcm_controller.dart';
+import 'package:arsys/student/controllers/event_controller.dart';
+import 'package:arsys/student/controllers/research_controller.dart';
+import 'package:arsys/student/controllers/student_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:arsys/network/api.dart';
+import 'package:arsys/network/network.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,11 +21,11 @@ class _StudentHomeState extends State<StudentHome> {
   final fcmC = Get.find<FCMController>();
   final researchC = Get.find<ResearchController>();
   final eventC = Get.find<EventController>();
-  final profileC = Get.find<ProfileController>();
+  final profileC = Get.find<StudentController>();
   @override
   void initState() {
     researchC.researchUser();
-    profileC.profileUser();
+    profileC.getProfile();
     eventC.eventUser();
     eventC.eventsUser();
     fcmC.sendToken();
@@ -38,13 +38,13 @@ class _StudentHomeState extends State<StudentHome> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 1) {
-        Get.offAndToNamed('/student-research');
+        Get.toNamed('/student-research');
       }
       if (_selectedNavbar == 2) {
-        Get.offAndToNamed('/student-event');
+        Get.toNamed('/student-event');
       }
       if (_selectedNavbar == 3) {
-        Get.offAndToNamed('/student-lecture');
+        Get.toNamed('/student-lecture');
       }
     });
   }
@@ -182,7 +182,7 @@ class _StudentHomeState extends State<StudentHome> {
 
   Future refreshEvent() async {
     profileC.profileClear();
-    profileC.profileUser();
+    profileC.getProfile();
     eventC.event.clear();
     eventC.eventUser();
     eventC.events.clear();

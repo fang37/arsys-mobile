@@ -1,17 +1,21 @@
 import 'package:arsys/authentication/authentication_manager.dart';
-import 'package:arsys/controllers/event_controller.dart';
-import 'package:arsys/controllers/lecture_controller.dart';
-import 'package:arsys/controllers/research_controller.dart';
-import 'package:arsys/controllers/profile_controller.dart';
+
 import 'package:arsys/login/view/login_view.dart';
+import 'package:arsys/student/controllers/event_controller.dart';
+import 'package:arsys/firebase/fcm_controller.dart';
+import 'package:arsys/student/controllers/lecture_controller.dart';
+import 'package:arsys/student/controllers/student_controller.dart';
+import 'package:arsys/student/controllers/research_controller.dart';
+import 'package:arsys/student/views/all_lecture.dart';
+import 'package:arsys/student/views/event.dart';
+import 'package:arsys/student/views/home.dart';
+import 'package:arsys/student/views/lecture.dart';
+import 'package:arsys/student/views/profile.dart';
+import 'package:arsys/student/views/reseach.dart';
+import 'package:arsys/student/views/research_detail.dart';
 import 'package:arsys/views/appbar.dart';
+import 'package:arsys/views/faculty/home.dart';
 import 'package:arsys/views/splash.dart';
-import 'package:arsys/views/student/all_lecture.dart';
-import 'package:arsys/views/student/event.dart';
-import 'package:arsys/views/student/lecture.dart';
-import 'package:arsys/views/student/profile.dart';
-import 'package:arsys/views/student/reseach.dart';
-import 'package:arsys/views/student/research_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -19,13 +23,10 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:arsys/views/faculty/home.dart';
-import 'package:arsys/views/student/home.dart';
 // import 'package:arsys/login/view/login';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'controllers/fcm_controller.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final fcmC = Get.put(FCMController());
     final eventC = Get.put(EventController());
-    final profileC = Get.put(ProfileController());
+    final profileC = Get.put(StudentController());
     final researchC = Get.put(ResearchController());
     final lectureC = Get.put(LectureController());
     // final fcmC = Get.put(FCMController());

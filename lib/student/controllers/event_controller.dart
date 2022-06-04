@@ -5,6 +5,7 @@ import 'package:arsys/network/network.dart';
 import 'package:arsys/network/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -40,81 +41,29 @@ class EventController extends GetxController {
 
   Future eventUser() async {
     if (event.value.isEmpty) {
-      var res;
-      res = await Network().getEvent();
-      // print(res.bodyString);
-      // print(res.body);
+      var response;
+      response = await Network().getEvent();
+      // print(response.bodyString);
+
       var body;
       try {
-        body = await json.decode(res.bodyString);
-        // print(body); v
+        body = await json.decode(response.bodyString);
       } catch (e) {
         print(e);
         return event;
       }
 
       try {
-        if (body['success']) {
+        if (response.statusCode == HttpStatus.ok) {
           event.value.clear();
           var bodies = body['event'];
           if (bodies.length != 0) {
-            for (var b in bodies) {
-              id = b['id'];
-              event_id = b['event_id'];
-              event_code = b['event_code'] ?? "";
-              event_type = b['event_type'];
-              application_deadline = b['application_deadline'] ?? "";
-              event_date = b['event_date'] ?? "";
-              draft_deadline = b['draft_deadline'] ?? "";
-              quota = b['quota'];
-              current = b['current'];
-              creator = b['creator'] ?? "";
-              status = b['status'];
-
-              if (event_date != null && event_date != "") {
-                var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-                var inputDate = inputFormat.parse(event_date!);
-
-                var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
-                var outputDate = outputFormat.format(inputDate);
-
-                event_date = outputDate.toString();
-              }
-              if (application_deadline != null && application_deadline != "") {
-                var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-                var inputDate = inputFormat.parse(application_deadline!);
-
-                var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
-                var outputDate = outputFormat.format(inputDate);
-
-                application_deadline = outputDate.toString();
-              }
-              if (draft_deadline != null && draft_deadline != "") {
-                var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-                var inputDate = inputFormat.parse(draft_deadline!);
-
-                var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
-                var outputDate = outputFormat.format(inputDate);
-
-                draft_deadline = outputDate.toString();
-              }
-
-              event.add(Event(
-                  id: id,
-                  event_id: event_id,
-                  event_name: event_name[event_type],
-                  event_code: event_code,
-                  event_type: event_type,
-                  application_deadline: application_deadline,
-                  event_date: event_date,
-                  draft_deadline: draft_deadline,
-                  quota: quota,
-                  current: current,
-                  creator: creator,
-                  status: status));
+            for (var item in bodies) {
+              event.add(Event.fromJson(item));
             }
           }
         }
+
         return (event);
       } catch (e) {
         print(e);
@@ -125,76 +74,24 @@ class EventController extends GetxController {
 
   Future eventsUser() async {
     if (events.value.isEmpty) {
-      var res;
-      res = await Network().getEvents();
-      // print(res.bodyString);
-      // print(res.body);
+      var response;
+      response = await Network().getEvents();
+      // print(response.bodyString);
       var body;
+
       try {
-        body = await json.decode(res.bodyString);
+        body = await json.decode(response.bodyString);
       } catch (e) {
         print(e);
         return events;
       }
 
       try {
-        if (body['success']) {
+        if (response.statusCode == HttpStatus.ok) {
           events.value.clear();
           var bodies = body['event'];
-          for (var b in bodies) {
-            id = b['id'];
-            event_id = b['event_id'];
-            event_code = b['event_code'] ?? "";
-            event_type = b['event_type'];
-            application_deadline = b['application_deadline'] ?? "";
-            event_date = b['event_date'] ?? "";
-            draft_deadline = b['draft_deadline'] ?? "";
-            quota = b['quota'];
-            current = b['current'];
-            creator = b['creator'] ?? "";
-            status = b['status'];
-
-            if (event_date != null && event_date != "") {
-              var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-              var inputDate = inputFormat.parse(event_date!);
-
-              var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
-              var outputDate = outputFormat.format(inputDate);
-
-              event_date = outputDate.toString();
-            }
-            if (application_deadline != null && application_deadline != "") {
-              var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-              var inputDate = inputFormat.parse(application_deadline!);
-
-              var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
-              var outputDate = outputFormat.format(inputDate);
-
-              application_deadline = outputDate.toString();
-            }
-            if (draft_deadline != null && draft_deadline != "") {
-              var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-              var inputDate = inputFormat.parse(draft_deadline!);
-
-              var outputFormat = DateFormat('dd-MM-yyyy HH:mm');
-              var outputDate = outputFormat.format(inputDate);
-
-              draft_deadline = outputDate.toString();
-            }
-
-            events.add(Event(
-                id: id,
-                event_id: event_id,
-                event_name: event_name[event_type],
-                event_code: event_code,
-                event_type: event_type,
-                application_deadline: application_deadline,
-                event_date: event_date,
-                draft_deadline: draft_deadline,
-                quota: quota,
-                current: current,
-                creator: creator,
-                status: status));
+          for (var item in bodies) {
+            events.add(Event.fromJson(item));
           }
         }
         return (events);

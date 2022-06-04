@@ -63,8 +63,8 @@ class _LectureState extends State<Lecture> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
                             child: Text(
                               'LECTURE',
                               style: TextStyle(
@@ -78,7 +78,7 @@ class _LectureState extends State<Lecture> {
                               onPressed: () {
                                 Get.toNamed('/student-lectures');
                               },
-                              child: Text(
+                              child: const Text(
                                 'See All',
                                 style: TextStyle(
                                     fontSize: 16,
@@ -683,7 +683,7 @@ class _LectureState extends State<Lecture> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text(
-                              "${snapshot.data[index].team_name}",
+                              "${snapshot.data[index].teamName}",
                               style: TextStyle(
                                   fontFamily: 'Helvetica',
                                   color: Colors.black54),
@@ -771,8 +771,10 @@ class _LectureState extends State<Lecture> {
 
   Future refreshResearch() async {
     lectureC.lecture.clear();
+    print("1 MASIH OKE");
     lectureC.lectureUser();
-    await Future.delayed(Duration(seconds: 2));
+    // await Future.delayed(Duration(seconds: 2));
+    print("3 MASIH OKE");
     setState(() {});
   }
 

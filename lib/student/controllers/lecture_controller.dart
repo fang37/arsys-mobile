@@ -6,30 +6,25 @@ import 'package:arsys/network/lecture_provider.dart';
 import 'package:arsys/network/research_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 class LectureController extends GetxController {
   var lecture = List<Lecture>.empty().obs;
   var lectures = List<Lecture>.empty().obs;
-  // var research_name = {
-  //   1: 'SKRIPSI',
-  //   2: 'Tugas Akhir',
-  //   3: 'PRAKTIK INDUSTRI',
-  //   4: 'Seminar Teknik Elektro',
-  //   5: 'TESIS',
-  //   6: 'DISERTASI'
+
   // };
-  int? id;
-  String? name; // subject[name]
-  String? code; // subject[code]
-  String? credit; // subject[credit]
-  String? semester; // subject[semester]
-  String? program_name; // program[abbrev]
-  int? program_id; // program[abbrev]
-  String? room; // room[name]
-  String? daytime; // daytime
-  String team_name = ""; // daytime
+  // int? id;
+  // String? name; // subject[name]
+  // String? code; // subject[code]
+  // String? credit; // subject[credit]
+  // String? semester; // subject[semester]
+  // String? program_name; // program[abbrev]
+  // int? program_id; // program[abbrev]
+  // String? room; // room[name]
+  // String? daytime; // daytime
+  // String team_name = ""; // daytime
 
   var team;
 
@@ -37,77 +32,26 @@ class LectureController extends GetxController {
     print("LECTURE USER 1");
     if (lecture.value.isEmpty) {
       print("LECTURE USER 2");
-      var lec;
-      lec = await Network().getLecture(); // LECTURE PROVIDER
-      print(lec.bodyString);
+      var response;
+      response = await Network().getLecture(); // LECTURE PROVIDER
+      print(response.bodyString);
       // print(lec.body);
       var body;
       try {
-        body = await json.decode(lec.bodyString);
+        body = await json.decode(response.bodyString);
       } catch (e) {
         print(e);
         return lecture;
       }
 
       try {
-        if (body['success']) {
+        if (response.statusCode == HttpStatus.ok) {
           lecture.value.clear();
           var bodies = body['schedules'];
           if (bodies.length != 0) {
             print("LECTURE USER 3");
-            for (var b in bodies) {
-              id = b['id'];
-              name = b['subject']['name'] ?? "";
-              code = b['subject']['code'] ?? "";
-              credit = b['subject']['credit'] ?? "";
-              semester = b['subject']['semester'] ?? "";
-              program_name = b['program']['abbrev'] ?? "";
-              program_id = b['program']['id'];
-              room = (b['room_id'] != null) ? b['room']['name'] : "-";
-              daytime = b['daytime'];
-              team = b['teams'] ?? "";
-
-              if (daytime != null) {
-                // daytime = daytime!.substring(
-                //     0, daytime!.length - 3); //remove seconds in daytime
-                var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-                var inputDate = inputFormat.parse(daytime!);
-
-                var outputFormat = DateFormat('EEEE HH:mm');
-                var outputDate = outputFormat.format(inputDate);
-
-                var end_Format = DateFormat('HH:mm');
-                var end_daytime = end_Format.format(inputDate
-                    .add(Duration(minutes: (50 * int.parse(credit!)))));
-
-                // daytime = end_daytime.toString();
-                daytime = outputDate.toString() + "-${end_daytime.toString()}";
-              }
-
-              team.forEach((t) {
-                // team_name = team_name ?? '' + ((t['faculty']['code']) ?? '');
-                if (team_name == "") {
-                  team_name = (t['faculty']['code']) ?? '';
-                } else {
-                  team_name =
-                      team_name + " - " + ((t['faculty']['code']) ?? '');
-                }
-              });
-
-              lecture.add(Lecture(
-                  id: id,
-                  name: name,
-                  code: code,
-                  credit: credit,
-                  semester: semester,
-                  program_name: program_name,
-                  program_id: program_id,
-                  room: room,
-                  daytime: daytime ?? "-",
-                  team: team,
-                  team_name: team_name));
-
-              team_name = "";
+            for (var item in bodies) {
+              lecture.add(Lecture.fromJson(item));
             }
           }
           print(lecture);
@@ -127,84 +71,33 @@ class LectureController extends GetxController {
     print("LECTURE USER 1");
     if (lectures.value.isEmpty) {
       print("LECTURE USER 2");
-      var lec;
-      lec = await Network().getLectures(); // LECTURE PROVIDER
-      print(lec.bodyString);
-      // print(lec.body);
+      var response;
+      response = await Network().getLectures(); // LECTURE PROVIDER
+      print(response.bodyString);
       var body;
+
       try {
-        body = await json.decode(lec.bodyString);
+        body = await json.decode(response.bodyString);
       } catch (e) {
         print(e);
         return lectures;
       }
 
       try {
-        if (body['success']) {
+        if (response.statusCode == HttpStatus.ok) {
           lectures.value.clear();
           var bodies = body['schedules'];
           if (bodies.length != 0) {
             print("LECTURE USER 3");
-            for (var b in bodies) {
-              id = b['id'];
-              name = b['subject']['name'] ?? "";
-              code = b['subject']['code'] ?? "";
-              credit = b['subject']['credit'] ?? "";
-              semester = b['subject']['semester'] ?? "";
-              program_name = b['program']['abbrev'] ?? "";
-              program_id = b['program']['id'];
-              room = (b['room_id'] != null) ? b['room']['name'] : "-";
-              daytime = b['daytime'];
-              team = b['teams'] ?? "";
-
-              if (daytime != null) {
-                // daytime = daytime!.substring(
-                //     0, daytime!.length - 3); //remove seconds in daytime
-                var inputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-                var inputDate = inputFormat.parse(daytime!);
-
-                var outputFormat = DateFormat('EEEE HH:mm');
-                var outputDate = outputFormat.format(inputDate);
-
-                var end_Format = DateFormat('HH:mm');
-                var end_daytime = end_Format.format(inputDate
-                    .add(Duration(minutes: (50 * int.parse(credit!)))));
-
-                // daytime = end_daytime.toString();
-                daytime = outputDate.toString() + "-${end_daytime.toString()}";
-              }
-
-              team.forEach((t) {
-                // team_name = team_name ?? '' + ((t['faculty']['code']) ?? '');
-                if (team_name == "") {
-                  team_name = (t['faculty']['code']) ?? '';
-                } else {
-                  team_name =
-                      team_name + " - " + ((t['faculty']['code']) ?? '');
-                }
-              });
-
-              lectures.add(Lecture(
-                  id: id,
-                  name: name,
-                  code: code,
-                  credit: credit,
-                  semester: semester,
-                  program_name: program_name,
-                  program_id: program_id,
-                  room: room,
-                  daytime: daytime ?? "-",
-                  team: team,
-                  team_name: team_name));
-
-              team_name = "";
+            for (var item in bodies) {
+              lectures.add(Lecture.fromJson(item));
             }
           }
           print(lectures);
         }
         // from low to high according to price
         lectures.sort((a, b) => a.semester!.compareTo(b.semester!));
-        // lectures.sort((a, b) => a.class_code!.compareTo(b.class_code!));
+        // lecture.sort((a, b) => a.class_code!.compareTo(b.class_code!));
         return (lectures);
       } catch (e) {
         print(e);

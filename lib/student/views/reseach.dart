@@ -54,13 +54,13 @@ class _StudentResearchState extends State<StudentResearch> {
               onRefresh: refreshResearch,
               child: SafeArea(
                 child: Container(
-                  padding: EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(15),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text(
                           'Research',
                           style: TextStyle(
@@ -81,11 +81,11 @@ class _StudentResearchState extends State<StudentResearch> {
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
-                                  return Center(
+                                  return const Center(
                                     child: CircularProgressIndicator(),
                                   );
                                 } else if (snapshot.data.length == 0) {
-                                  return Expanded(
+                                  return const Expanded(
                                       child:
                                           Center(child: Text('No Research')));
                                 } else {
@@ -108,9 +108,9 @@ class _StudentResearchState extends State<StudentResearch> {
                                                 elevation: 0,
                                                 color: researchC
                                                     .cardColorBuilder(snapshot
-                                                            .data[index]
-                                                            .milestone[
-                                                        'milestone']),
+                                                        .data[index]
+                                                        .milestone
+                                                        .milestone),
                                                 shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -126,10 +126,11 @@ class _StudentResearchState extends State<StudentResearch> {
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                         color: researchC
-                                                            .cardColorBuilder(snapshot
+                                                            .cardColorBuilder(
+                                                                snapshot
                                                                     .data[index]
-                                                                    .milestone[
-                                                                'milestone'])
+                                                                    .milestone
+                                                                    .milestone)
                                                         // gradient:
                                                         // LinearGradient(
                                                         //     colors: [
@@ -148,6 +149,10 @@ class _StudentResearchState extends State<StudentResearch> {
                                                         ),
                                                     child: ListTile(
                                                       onTap: () {
+                                                        print("CHECK LENGTH");
+                                                        print(snapshot
+                                                            .data[index]
+                                                            .supervisor);
                                                         Get.toNamed(
                                                             '/student-research-detail',
                                                             arguments: snapshot
@@ -160,7 +165,7 @@ class _StudentResearchState extends State<StudentResearch> {
                                                       isThreeLine: true,
                                                       title: Text(
                                                           snapshot.data[index]
-                                                              .research_name,
+                                                              .researchName,
                                                           style: TextStyle(
                                                               fontSize: 24,
                                                               fontFamily:
@@ -171,7 +176,7 @@ class _StudentResearchState extends State<StudentResearch> {
                                                               color: Colors
                                                                   .white)),
                                                       subtitle: Text(
-                                                        "${snapshot.data[index].milestone['milestone']} \n${snapshot.data[index].milestone['description'] ?? '-'}",
+                                                        "${snapshot.data[index].milestone.milestone} \n${snapshot.data[index].milestone.description}",
                                                         style: TextStyle(
                                                             fontFamily:
                                                                 'OpenSans'),
@@ -180,22 +185,23 @@ class _StudentResearchState extends State<StudentResearch> {
                                                           researchC.iconBuilder(
                                                               snapshot
                                                                   .data[index]
-                                                                  .research_type,
+                                                                  .researchType,
                                                               65,
                                                               index,
                                                               snapshot
-                                                                      .data[index]
-                                                                      .milestone[
-                                                                  'milestone']),
+                                                                  .data[index]
+                                                                  .milestone
+                                                                  .milestone),
                                                       trailing: Column(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
                                                                 .center,
                                                         children: [
                                                           Text(
-                                                            snapshot.data[index]
-                                                                    .milestone[
-                                                                'phase'],
+                                                            snapshot
+                                                                .data[index]
+                                                                .milestone
+                                                                .phase,
                                                             style: TextStyle(
                                                                 fontSize: 16,
                                                                 fontStyle:

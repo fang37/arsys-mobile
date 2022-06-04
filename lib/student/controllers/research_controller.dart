@@ -2,87 +2,52 @@ import 'dart:convert';
 import 'package:arsys/network/network.dart';
 import 'package:arsys/network/event_provider.dart';
 import 'package:arsys/network/research_provider.dart';
+import 'package:arsys/student/models/defense_approval.dart';
 import 'package:arsys/student/models/research.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ResearchController extends GetxController {
   var research = List<Research>.empty().obs;
-  var research_name = {
-    1: 'SKRIPSI',
-    2: 'Tugas Akhir',
-    3: 'PRAKTIK INDUSTRI',
-    4: 'Seminar Teknik Elektro',
-    5: 'TESIS',
-    6: 'DISERTASI'
-  };
 
-  int? id;
-  int? research_type;
-  String? research_code;
-  String? title;
-  String? abstract;
-  int? research_milestone;
-  int? status;
-  String? approval_date;
-  String? research_id;
-
-  var supervisor;
-  var supervise;
-  var milestone;
-  var defense_approval;
+  // int? id;
+  // int? research_type;
+  // String? research_code;
+  // String? title;
+  // String? abstract;
+  // int? research_milestone;
+  // int? status;
+  // String? approval_date;
+  // String? research_id
+  // var supervisor;
+  // var supervise;
+  // var milestone;
+  // DefenseApproval? defenseApproval;
 
   Future researchUser() async {
     if (research.value.isEmpty) {
-      var res;
-      res = await Network().getResearch();
-      print(res.bodyString);
-      // print(res.body);
+      var response;
+      response = await Network().getResearch();
+      // print(response.bodyString);
+
       var body;
+
       try {
-        body = await json.decode(res.bodyString);
+        body = await json.decode(response.bodyString);
       } catch (e) {
         print(e);
         return research;
       }
 
       try {
-        if (body['success']) {
+        if (response.statusCode == HttpStatus.ok) {
           research.value.clear();
-          var bodies = body['research'];
-          if (bodies.length != 0) {
-            for (var b in bodies) {
-              id = b['id'];
-              research_type = b['research_type'];
-              research_code = b['research_code'];
-              title = b['title'];
-              abstract = b['abstract'];
-              research_milestone = b['research_milestone'];
-              status = b['status'];
-              approval_date = b['approval_date'];
-              research_id = b['research_id'];
-              supervisor = b['supervisor'];
-              supervise = b['supervise'];
-              milestone = b['milestone'];
-              defense_approval = b['defense_approval'];
-
-              research.add(Research(
-                id: id,
-                research_type: research_type,
-                research_name: research_name[research_type],
-                research_code: research_code,
-                title: title,
-                abstract: abstract,
-                research_milestone: research_milestone,
-                status: status,
-                approval_date: approval_date,
-                research_id: research_id,
-                supervisor: supervisor,
-                supervise: supervise,
-                milestone: milestone,
-                defense_approval: defense_approval,
-              ));
+          var researches = body['research'];
+          if (researches.length != 0) {
+            for (var item in researches) {
+              research.add(Research.fromJson(item));
             }
           }
           print(research);
@@ -163,17 +128,52 @@ class ResearchController extends GetxController {
   }
 
   Icon approvalIcon(var decision) {
-    if (decision == 1) {
+    if (decision) {
       return Icon(Icons.check_circle, size: 30, color: Colors.greenAccent);
     } else
       return Icon(Icons.block, size: 30, color: Colors.redAccent);
   }
 
-  Color timelineColor(int decision) {
-    if (decision == 1) {
+  Color timelineColor(bool decision) {
+    if (decision) {
       return Colors.greenAccent;
     } else
       return Colors.redAccent;
+  }
+
+  Icon proposalDecisionIcon(int decision) {
+    switch (decision) {
+      case 1:
+        {
+          return const Icon(Icons.check_circle_rounded,
+              size: 30, color: Colors.greenAccent);
+        }
+      case 2:
+        {
+          return const Icon(Icons.block_rounded,
+              size: 30, color: Colors.redAccent);
+        }
+      case 3:
+        {
+          return const Icon(Icons.create_rounded,
+              size: 30, color: Colors.blueGrey);
+        }
+      case 4:
+        {
+          return const Icon(Icons.co_present_rounded,
+              size: 30, color: Colors.blueGrey);
+        }
+      case 5:
+        {
+          return const Icon(Icons.playlist_add_check_rounded,
+              size: 30, color: Colors.lightBlueAccent);
+        }
+      default:
+        {
+          return const Icon(Icons.access_time_rounded,
+              size: 30, color: Colors.lightBlueAccent);
+        }
+    }
   }
 
   void snackBarError(String msg) {

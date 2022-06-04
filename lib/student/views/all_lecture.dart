@@ -387,7 +387,7 @@ class _AllLectureState extends State<AllLecture> {
                                                     .toLowerCase()
                                                     .contains(day) &&
                                                 (snapshot.data[index]
-                                                            .program_id ==
+                                                            .programId ==
                                                         prodi ||
                                                     prodi == 0)) {
                                               return ListElement(
@@ -408,7 +408,7 @@ class _AllLectureState extends State<AllLecture> {
                                                     .toLowerCase()
                                                     .contains(day) &&
                                                 (snapshot.data[index]
-                                                            .program_id ==
+                                                            .programId ==
                                                         prodi ||
                                                     prodi == 0)) {
                                               return ListElement(
@@ -819,7 +819,7 @@ class _AllLectureState extends State<AllLecture> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text(
-                              "${snapshot.data[index].team_name}",
+                              "${snapshot.data[index].teamName}",
                               style: TextStyle(
                                   fontFamily: 'Helvetica',
                                   color: Colors.black54),
@@ -906,9 +906,9 @@ class _AllLectureState extends State<AllLecture> {
   }
 
   Future refreshResearch() async {
-    lectureC.lecture.clear();
-    lectureC.lectureUser();
-    await Future.delayed(Duration(seconds: 2));
+    lectureC.lectures.clear();
+    lectureC.allLecture();
+    // await Future.delayed(Duration(seconds: 2));
     setState(() {});
   }
 

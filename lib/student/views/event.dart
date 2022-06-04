@@ -104,8 +104,6 @@ class _StudentEventState extends State<StudentEvent> {
                                       child: Center(
                                           child: Text('No Event Applied')));
                                 } else {
-                                  // print(snapshot.data[0].event_name);
-                                  // print(snapshot.data.length);
                                   return ListView.builder(
                                       shrinkWrap: true,
                                       physics: BouncingScrollPhysics(),
@@ -119,15 +117,15 @@ class _StudentEventState extends State<StudentEvent> {
                                                           15.0))),
                                           child: ListTile(
                                             title: Text(
-                                                snapshot.data[index].event_name,
+                                                snapshot.data[index].eventName,
                                                 style: TextStyle(
                                                     fontFamily: 'Helvetica',
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.grey[800])),
-                                            subtitle: Text(snapshot
-                                                .data[index].event_date),
+                                            subtitle: Text(
+                                                snapshot.data[index].eventDate),
                                             leading: eventC.iconBuilder(
-                                                snapshot.data[index].event_type,
+                                                snapshot.data[index].eventType,
                                                 40,
                                                 (index == 0)
                                                     ? Colors
@@ -178,7 +176,7 @@ class _StudentEventState extends State<StudentEvent> {
                                     child: Text('No Upcoming Event'),
                                   );
                                 } else {
-                                  // print(snapshot.data[0].event_name);
+                                  // print(snapshot.data[0].eventName);
                                   // print(snapshot.data!.length);
                                   return Column(
                                     crossAxisAlignment:
@@ -281,7 +279,7 @@ class _StudentEventState extends State<StudentEvent> {
                                                                     snapshot
                                                                         .data[
                                                                             index]
-                                                                        .event_name,
+                                                                        .eventName,
                                                                     style: eventC
                                                                         .rowStyle()),
                                                               ),
@@ -295,7 +293,7 @@ class _StudentEventState extends State<StudentEvent> {
                                                                       snapshot
                                                                           .data[
                                                                               index]
-                                                                          .application_deadline,
+                                                                          .applicationDeadline,
                                                                       style: eventC
                                                                           .rowStyle()),
                                                                 ),
@@ -310,7 +308,7 @@ class _StudentEventState extends State<StudentEvent> {
                                                                       snapshot
                                                                           .data[
                                                                               index]
-                                                                          .event_date,
+                                                                          .eventDate,
                                                                       style: eventC
                                                                           .rowStyle()),
                                                                 ),
@@ -322,14 +320,10 @@ class _StudentEventState extends State<StudentEvent> {
                                                                       Alignment
                                                                           .center,
                                                                   child: Text(
-                                                                      (snapshot.data[index].current ?? 0)
-                                                                              .toString() +
-                                                                          '/' +
-                                                                          snapshot
-                                                                              .data[
-                                                                                  index]
-                                                                              .quota
-                                                                              .toString(),
+                                                                      snapshot
+                                                                          .data[
+                                                                              index]
+                                                                          .getSeats(),
                                                                       style: eventC
                                                                           .rowStyle()),
                                                                 ),
@@ -452,7 +446,7 @@ class _StudentEventState extends State<StudentEvent> {
                                           Radius.circular(15))),
                                   child: Center(
                                     child: Text(
-                                      snapshot.data[index].event_name,
+                                      snapshot.data[index].eventName,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
@@ -466,10 +460,10 @@ class _StudentEventState extends State<StudentEvent> {
                                     indicatorStyle: IndicatorStyle(
                                         width: 25,
                                         color: eventC.timelineColor(snapshot
-                                            .data[index].application_deadline)),
+                                            .data[index].applicationDeadline)),
                                     afterLineStyle: LineStyle(
                                         color: eventC.timelineColor(snapshot
-                                            .data[index].application_deadline)),
+                                            .data[index].applicationDeadline)),
                                     endChild: Container(
                                       margin: EdgeInsets.all(8),
                                       child: Column(
@@ -488,7 +482,7 @@ class _StudentEventState extends State<StudentEvent> {
                                           ),
                                           Text(
                                             snapshot.data[index]
-                                                .application_deadline,
+                                                .applicationDeadline,
                                             style: TextStyle(
                                                 color: Color(0xff3A4856),
                                                 fontSize: 16,
@@ -505,13 +499,13 @@ class _StudentEventState extends State<StudentEvent> {
                                     indicatorStyle: IndicatorStyle(
                                         width: 25,
                                         color: eventC.timelineColor(snapshot
-                                            .data[index].draft_deadline)),
+                                            .data[index].draftDeadline)),
                                     beforeLineStyle: LineStyle(
                                         color: eventC.timelineColor(snapshot
-                                            .data[index].draft_deadline)),
+                                            .data[index].draftDeadline)),
                                     afterLineStyle: LineStyle(
                                         color: eventC.timelineColor(snapshot
-                                            .data[index].draft_deadline)),
+                                            .data[index].draftDeadline)),
                                     endChild: Container(
                                       margin: EdgeInsets.all(8),
                                       child: Column(
@@ -530,10 +524,10 @@ class _StudentEventState extends State<StudentEvent> {
                                           ),
                                           Text(
                                             (snapshot.data[index]
-                                                        .draft_deadline !=
+                                                        .draftDeadline !=
                                                     "")
                                                 ? snapshot
-                                                    .data[index].draft_deadline
+                                                    .data[index].draftDeadline
                                                 : "missing",
                                             style: TextStyle(
                                                 color: Color(0xff3A4856),
@@ -550,10 +544,10 @@ class _StudentEventState extends State<StudentEvent> {
                                     indicatorStyle: IndicatorStyle(
                                         width: 25,
                                         color: eventC.timelineColor(
-                                            snapshot.data[index].event_date)),
+                                            snapshot.data[index].eventDate)),
                                     beforeLineStyle: LineStyle(
                                         color: eventC.timelineColor(
-                                            snapshot.data[index].event_date)),
+                                            snapshot.data[index].eventDate)),
                                     isLast: true,
                                     endChild: Container(
                                       padding: EdgeInsets.all(8),
@@ -572,7 +566,7 @@ class _StudentEventState extends State<StudentEvent> {
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           Text(
-                                            snapshot.data[index].event_date,
+                                            snapshot.data[index].eventDate,
                                             style: TextStyle(
                                                 color: Color(0xff3A4856),
                                                 fontSize: 16,
@@ -594,8 +588,7 @@ class _StudentEventState extends State<StudentEvent> {
                                   MediaQuery.of(context).size.width / 2 * 0.7,
                               lineWidth: 15.0,
                               animation: true,
-                              percent: (snapshot.data[index].current ?? 0) /
-                                  snapshot.data[index].quota,
+                              percent: snapshot.data[index].getSeatsPercent(),
                               footer: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
@@ -607,8 +600,7 @@ class _StudentEventState extends State<StudentEvent> {
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              center: Text(
-                                  "${snapshot.data[index].current ?? '?'} / ${snapshot.data[index].quota}",
+                              center: Text(snapshot.data[index].getSeats(),
                                   style: TextStyle(
                                       color: Color(0xff3A4856),
                                       fontSize: 24,

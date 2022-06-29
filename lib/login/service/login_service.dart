@@ -7,7 +7,7 @@ import 'package:get/get_connect/http/src/status/http_status.dart';
 /// LoginService responsible to communicate with web-server
 /// via authenticaton related APIs
 class LoginService extends GetConnect {
-  final String loginUrl = 'http://192.168.1.5:80/api/arsys/login';
+  final String loginUrl = 'http://192.168.1.7:80/api/arsys/login';
   // final String registerUrl = '';
 
   Future<LoginResponseModel?> fetchLogin(LoginRequestModel model) async {

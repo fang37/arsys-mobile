@@ -1,7 +1,10 @@
-import 'package:arsys/faculty/model/faculty.dart';
+import 'package:arsys/faculty/models/faculty.dart';
 import 'package:arsys/student/models/defense_approval.dart';
 import 'package:arsys/student/models/milestone.dart';
 import 'package:arsys/student/models/proposal_review.dart';
+import 'package:arsys/student/models/student.dart';
+import 'package:arsys/student/models/turnitin.dart';
+import 'package:get/get.dart';
 
 class Research {
   int? id;
@@ -20,11 +23,16 @@ class Research {
   bool siasFinal = false;
   bool siasFinalPre = false;
 
+  Student? student;
   List<Faculty>? supervisor = <Faculty>[];
   Milestone? milestone;
   List<DefenseApproval>? defenseApproval = <DefenseApproval>[];
   List<ProposalReview>? proposalReview = <ProposalReview>[];
+  Turnitin? turnitinPre;
+
   // var supervise;
+
+  var information = "".obs;
 
   Research({
     this.id,
@@ -67,7 +75,39 @@ class Research {
     siasProPre = siasStatusAssigner(json['s_i_a_s_pro_pre']);
     siasFinal = siasStatusAssigner(json['s_i_a_s_final']);
     siasFinalPre = siasStatusAssigner(json['s_i_a_s_final_pre']);
+
+    turnitinPre = turnitinAssigner(json['turnitin_predefense']);
+    updateInformation();
     // supervise = json['supervise'];
+  }
+
+  Research.listFromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    researchType = json['research_type'] ?? -1;
+    researchName = getResearchName(json['research_type'] ?? -1);
+    researchCode = json['research_code'];
+    title = json['title'];
+    abstract = json['abstract'];
+    researchMilestone = json['research_milestone'] ?? -1;
+    status = json['status'] ?? -1;
+    approvalDate = json['approval_date'];
+    milestone = Milestone.fromJson(json['milestone']);
+    // supervise = json['supervise'];
+  }
+
+  Research.supervisionFromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    researchType = json['research_type'] ?? -1;
+    researchName = getResearchName(json['research_type'] ?? -1);
+    researchCode = json['research_code'];
+    title = json['title'];
+    abstract = json['abstract'];
+    researchMilestone = json['research_milestone'] ?? -1;
+    status = json['status'] ?? -1;
+    approvalDate = json['approval_date'];
+    print("Here");
+    milestone = Milestone.fromJson(json['milestone']);
+    student = Student.fromJson(json['student']);
   }
 
   String getResearchName(int type) {
@@ -103,27 +143,48 @@ class Research {
     }
   }
 
-  String getInformation() {
-    String message = milestone!.description ?? "";
+  String getSupervisorCode() {
+    String code = "-";
+    for (Faculty sv in supervisor!) {
+      if (code == "-") {
+        code = sv.code!;
+      } else {
+        code = code + " - " + sv.code!;
+      }
+    }
+    return code;
+  }
+
+  void updateInformation() {
+    information.value = milestone!.description ?? "";
     if (milestone?.sequence == 4) {
       // Proposal sudah approved di arsys
       if (siasPro) {
         // Proposal approved di SIAS
-        message =
+        information.value =
             "Checking research proposal in SIAS has been done. Now, you can proceed to the next step.";
       } else {
         // Proposal belum approved di SIAS
         if (!siasProPre) {
           // Proposal belum di submit ke SIAS
-          message =
+          information.value =
               "Submit your research proposal at SIAS, and hit the SUBMIT button if you done.\nYou could not proceed to the next stage if you have not confirmed, and please submitted it no later than two weeks.";
         } else {
           // Proposal menunggu pengecekan oleh admin ke SIAS
-          message = "Waiting admin approval based on SIAS";
+          information.value = "Waiting admin approval based on SIAS";
         }
       }
     }
-    return message;
+    if (milestone?.sequence == 6) {
+      if (turnitinPre?.approval == false) {
+        information.value =
+            "${milestone?.message} please fullfil the other requirements on arsys-website";
+      }
+    }
+    if (milestone?.sequence == 8) {
+      information.value =
+          "Pre defense has been scheduled, please contact your supervisors and examiners for confirmation";
+    }
   }
 
   bool siasStatusAssigner(var sias) {
@@ -133,7 +194,145 @@ class Research {
       return true;
     }
   }
+
+  Turnitin turnitinAssigner(var turnitin) {
+    if (turnitin == null) {
+      return Turnitin.nullJson();
+    } else {
+      return Turnitin.fromJson(turnitin);
+    }
+  }
+
+  SubmissionType getSubmissionType() {
+    if (milestone?.sequence == 4 && siasProPre == false && siasPro == false) {
+      // SIAS Proposal
+      return SubmissionType.siasPro;
+    } else if (milestone?.sequence == 4 && siasPro == true) {
+      // Pre Defense Propose
+      return SubmissionType.defense;
+    } else if (milestone?.sequence == 6 && turnitinPre?.id == -1) {
+      // Request Turnitin Invitation
+      return SubmissionType.turnitin;
+    } else if (milestone?.sequence == 9) {
+      // Defense Report
+      return SubmissionType.defenseReport;
+    } else if (milestone?.sequence == 10 && milestone!.proposeButton) {
+      // Final Defense Propose
+      return SubmissionType.finalDefense;
+    } else {
+      return SubmissionType.none;
+    }
+  }
+
+  getSubmissionButton() {
+    if (milestone?.sequence == 4 && siasProPre == false && siasPro == false) {
+      // SIAS Proposal
+      return true;
+    } else if (milestone?.sequence == 4 && siasPro == true) {
+      // Pre Defense
+      return true;
+    } else if (milestone?.sequence == 6 && turnitinPre?.id == -1) {
+      // Request Turnitin Invitation
+      return true;
+    } else if (milestone?.sequence == 9) {
+      // Report of Defense
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  String getSubmissionTitle() {
+    if (getSubmissionType() == SubmissionType.siasPro) {
+      // SIAS Proposal
+      return "SIAS Proposal";
+    } else if (getSubmissionType() == SubmissionType.defense) {
+      return "Pre Defense";
+    } else if (getSubmissionType() == SubmissionType.turnitin) {
+      return "Turnitin";
+    } else if (getSubmissionType() == SubmissionType.defenseReport) {
+      // Report of Defense
+      return "Report of Defense";
+    } else if (getSubmissionType() == SubmissionType.finalDefense) {
+      // Report of Defense
+      return "Final Defense";
+    } else {
+      return "You have no submission for now";
+    }
+  }
+
+  String getSubmissionDescription() {
+    if (getSubmissionType() == SubmissionType.siasPro) {
+      return "Only hit the SUBMIT button when you're finished uploading the research propsal at SIAS";
+    } else if (getSubmissionType() == SubmissionType.defense) {
+      return "Hit the propose button to proceed the next step";
+    } else if (getSubmissionType() == SubmissionType.turnitin) {
+      return "Get Turnitin score by the invitation and Pass Turnitin similarity < 25% \nMake sure that your email address is valid. Hence, please check the email address in your profile before applying the Turnitin invitation. Please refer to the nearest defense schedule for the deadline of Turnitin submission";
+    } else if (getSubmissionType() == SubmissionType.defenseReport) {
+      return "You should write the report of defense to continue the milestone";
+    } else if (getSubmissionType() == SubmissionType.finalDefense) {
+      return "Hit the propose button to proceed the next step";
+    } else {
+      return '';
+    }
+  }
+
+  EventType getEventType() {
+    if (milestone?.sequence == 6 &&
+        turnitinPre!.score! <= 25 &&
+        turnitinPre?.approval == true) {
+      // Apply Pre Defense Event
+      return EventType.preDefense;
+    } else if (milestone?.sequence == 7 ||
+        milestone?.sequence == 8 ||
+        milestone?.sequence == 9) {
+      // Open Event Page for see the schedule and details of event
+      return EventType.schedule;
+    } else if (milestone?.sequence == 12) {
+      // Apply Final Defense Event
+      return EventType.finalDefense;
+    } else if (milestone?.sequence == 13 ||
+        milestone?.sequence == 14 ||
+        milestone?.sequence == 15) {
+      // Open Event Page for see the schedule and details of event
+      return EventType.schedule;
+    } else {
+      return EventType.none;
+    }
+  }
+
+  bool getEventButton() {
+    if (getEventType() == EventType.preDefense) {
+      // Apply Pre Defense Event
+      return true;
+    } else if (milestone?.sequence == 12) {
+      // Apply Final Defense Event
+      return true;
+    } else
+      return false;
+  }
+
+  bool getEventScheduleButton() {
+    if (milestone?.sequence == 7 ||
+        milestone?.sequence == 8 ||
+        milestone?.sequence == 9) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
+
+enum SubmissionType {
+  none,
+  siasPro,
+  defense,
+  turnitin,
+  preDefenseEvent,
+  defenseReport,
+  finalDefense
+}
+enum EventType { none, preDefense, finalDefense, schedule }
 
 
 //  "research": [

@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Network extends GetConnect {
   //if you are using android studio emulator, change localhost to 10.0.2.2
 
-  final url = "http://192.168.1.5:80/api";
+  final url = "http://192.168.1.7:80/api";
 
   String arsysUrl(String endpoint) {
     return '$url/arsys/$endpoint';
@@ -32,6 +32,105 @@ class Network extends GetConnect {
   //     return false;
   //   }
   // }
+
+  submitSiasProPre(int? researchId) async {
+    if (researchId != null) {
+      var data = {'research_id': researchId};
+      await _getToken();
+      var fullUrl = arsysUrl("research-sias-pro");
+      try {
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  proposeDefense(int? researchId) async {
+    if (researchId != null) {
+      var data = {'research_id': researchId};
+      await _getToken();
+      var fullUrl = arsysUrl("research-propose");
+      try {
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  applyEvent(int? researchId, int? eventId) async {
+    if (researchId != null) {
+      var data = {'research_id': researchId, 'event_id': eventId};
+      await _getToken();
+      var fullUrl = arsysUrl("event");
+      try {
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  requestTurnitinInvitation(int? researchId) async {
+    if (researchId != null) {
+      var data = {'research_id': researchId};
+      await _getToken();
+      var fullUrl = arsysUrl("research-turnitin-invitation");
+      try {
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  submitDefenseReport(int? researchId, int? applicantId, String? defenseResume,
+      String? defenseDate) async {
+    if (researchId != null &&
+        applicantId != null &&
+        defenseResume != null &&
+        defenseDate != null) {
+      var data = {
+        'research_id': researchId,
+        'applicant_id': applicantId,
+        'defense_resume': defenseResume,
+        'defense_date': defenseDate
+      };
+      await _getToken();
+      var fullUrl = arsysUrl("research-defense-report");
+      try {
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
   createFcmToken(data) async {
     await _getToken();
@@ -87,12 +186,34 @@ class Network extends GetConnect {
     return get(arsysUrl("events"), headers: _setHeaders());
   }
 
+  // APPLICABLE EVENT BY RESEARCH ID
+  Future<Response> getApplicableEventById(int id) async {
+    await _getToken();
+    print("GET APPLICABLE EVENT");
+    return get(arsysUrl("event-applicable/$id"), headers: _setHeaders());
+  }
+
+  // EVENT EVENT BY RESEARCH ID
+  Future<Response> getEventApplicantById(int id) async {
+    await _getToken();
+    print("GET APPLICABLE EVENT");
+    return get(arsysUrl("event-applicant/$id"), headers: _setHeaders());
+  }
+
   // RESEARCH
   Future<Response> getResearch() async {
     await _getToken();
     print("GET RESEARCH");
     print(token);
     return get(arsysUrl("research"), headers: _setHeaders());
+  }
+
+  // RESEARCH BY ID
+  Future<Response> getResearchById(int id) async {
+    await _getToken();
+    print("GET RESEARCH");
+    print(token);
+    return get(arsysUrl("research/$id"), headers: _setHeaders());
   }
 
   // TIMETABLE
@@ -108,7 +229,7 @@ class Network extends GetConnect {
   }
 
   // PROFILE
-  Future<Response> getStudentProfile() async {
+  Future<Response> getProfile() async {
     await _getToken();
     print("GET PROFILE");
     return get(arsysUrl("profile"), headers: _setHeaders());

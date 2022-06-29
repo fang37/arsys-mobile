@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:arsys/authentication/authentication_manager.dart';
+import 'package:arsys/faculty/controllers/faculty_controller.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/student/controllers/student_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -10,9 +11,10 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
-final profileC = Get.find<StudentController>();
 // final authC = Get.find<AuthController>();
 AuthenticationManager _authManager = Get.find();
+String activeRole = _authManager.activeRole;
+final profileC = Get.find<FacultyController>();
 
 PreferredSize HomeAppBarBuilder(context) {
   return PreferredSize(
@@ -23,7 +25,7 @@ PreferredSize HomeAppBarBuilder(context) {
         icon: Icon(Icons.menu_rounded),
         color: Colors.white,
       ),
-      title: Text("ArSys Mobile",
+      title: const Text("ArSys Mobile",
           style: TextStyle(
               fontSize: 18,
               fontFamily: "Helvetica",
@@ -69,7 +71,11 @@ PreferredSize HomeAppBarBuilder(context) {
           // color: Colors.lime,
           child: InkWell(
             onTap: () {
-              Get.toNamed('/student-profile');
+              if (activeRole == 'student') {
+                Get.toNamed('/student-profile');
+              } else if (activeRole == 'faculty' || activeRole == 'admin') {
+                Get.toNamed('/faculty-profile');
+              }
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -115,7 +121,8 @@ PreferredSize HomeAppBarBuilder(context) {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Text(profileC.student.role,
+                            Text(profileC.getRole(),
+                                // TODO: Gabung profile jadi satu
                                 style: TextStyle(
                                   height: 0.9,
                                   fontSize: 15,
@@ -218,7 +225,7 @@ AppBar AppBarBuilder() {
                       ),
                     ),
                   ),
-                  Text(profileC.student.role,
+                  Text(profileC.getRole(),
                       style: TextStyle(
                         fontSize: 15,
                         color: Colors.blue[100],

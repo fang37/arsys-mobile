@@ -1,4 +1,4 @@
-import 'package:arsys/faculty/model/faculty.dart';
+import 'package:arsys/faculty/models/faculty.dart';
 import 'package:arsys/student/models/defense_model.dart';
 
 class DefenseApproval {

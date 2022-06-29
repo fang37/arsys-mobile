@@ -10,22 +10,9 @@ import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ResearchController extends GetxController {
+class SupervisionController extends GetxController {
   var research;
   var researches = List<Research>.empty().obs;
-  // int? id;
-  // int? research_type;
-  // String? research_code;
-  // String? title;
-  // String? abstract;
-  // int? research_milestone;
-  // int? status;
-  // String? approval_date;
-  // String? research_id
-  // var supervisor;
-  // var supervise;
-  // var milestone;
-  // DefenseApproval? defenseApproval;
 
   Future researchUser() async {
     if (researches.value.isEmpty) {
@@ -48,7 +35,7 @@ class ResearchController extends GetxController {
           var items = body['research'];
           if (items.length != 0) {
             for (var item in items) {
-              researches.add(Research.fromJson(item));
+              researches.add(Research.supervisionFromJson(item));
             }
           }
           print(researches);
@@ -64,9 +51,9 @@ class ResearchController extends GetxController {
   Future<List<Research>> researchListUser() async {
     if (researches.value.isEmpty) {
       var response;
+      // TODO: make dedicated api for research list only
       response = await Network().getResearch();
       // print(response.bodyString);
-
       var body;
 
       try {
@@ -82,7 +69,7 @@ class ResearchController extends GetxController {
           var items = body['research'];
           if (items.length != 0) {
             for (var item in items) {
-              researches.add(Research.listFromJson(item));
+              researches.add(Research.supervisionFromJson(item));
             }
           }
           print(researches);
@@ -145,13 +132,6 @@ class ResearchController extends GetxController {
       default:
         break;
     }
-    // if (type == "siasPro") {
-    //   subbmitSiasPro(res);
-    // } else if (type == "defense") {
-    //   proposeDefense(res);
-    // } else if (type == 'turnitin') {
-    //   requestTurnitinInvitation(res);
-    // } else if (type == 'preDefenseEvent') {}
   }
 
   Future subbmitSiasPro(Research res) async {

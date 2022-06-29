@@ -10,8 +10,8 @@ import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class StudentController extends GetxController {
-  Student student = new Student();
+class FacultyController extends GetxController {
+  Faculty faculty = Faculty();
   // int? id;
   // String? firstName;
   // String? lastName;
@@ -35,14 +35,14 @@ class StudentController extends GetxController {
     7: 'Tenaga Kependidikan'
   };
 
-  var _specializationName = {
+  final _specializationName = {
     1: 'Elektronika Industri',
     2: 'Tenaga Elektrik',
     3: 'Telekomunikasi'
   };
 
   Future getProfile() async {
-    if (student.id == null) {
+    if (faculty.id == null) {
       var response;
       response = await Network().getProfile();
       // print(response.bodyString);
@@ -54,39 +54,31 @@ class StudentController extends GetxController {
         // print(body);
       } catch (e) {
         print(e);
-        return student;
+        return faculty;
       }
 
       try {
         if (response.statusCode == HttpStatus.ok) {
-          student = Student.fromJson(response.body);
-          print(student);
+          faculty = Faculty.fromJson(response.body);
+          print(faculty);
         }
-        return (student);
+        return (faculty);
       } catch (e) {
         print(e);
       }
     }
-    return (student);
-  }
-
-  void profileClear() {
-    student.id = null;
+    return (faculty);
   }
 
   String getFullName() {
-    return '${student.firstName} ${student.lastName}';
+    return faculty.getFullNameAndTitle();
   }
 
   String getRole() {
-    return student.role;
+    return faculty.role;
   }
 
-  String getSupervisorNameAndTitle() {
-    if (student.supervisor != null) {
-      return '${student.supervisor!.frontTitle} ${student.supervisor!.firstName} ${student.supervisor!.lastName}, ${student.supervisor!.rearTitle}';
-    } else {
-      return "-";
-    }
+  void profileClear() {
+    faculty.id = null;
   }
 }

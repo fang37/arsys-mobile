@@ -74,6 +74,19 @@ class Event {
     }
   }
 
+  String getDateInFormat({var date, String format = "dd MMM yyyy, HH.mm"}) {
+    if (date != null && date != "") {
+      var inputFormat = DateFormat('dd-MM-yyyy HH:mm');
+      var inputDate = inputFormat.parse(date!);
+
+      var outputFormat = DateFormat(format);
+      var outputDate = outputFormat.format(inputDate);
+      return outputDate.toString();
+    } else {
+      return "";
+    }
+  }
+
   String getSeats() {
     if (quota! >= 0) {
       if (current! >= 0) {
@@ -93,6 +106,8 @@ class Event {
       return 0;
     }
   }
+
+  getExaminerCode() {}
 }
 // EVENT RESPONSE SAMPLE
 

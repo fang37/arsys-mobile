@@ -1,6 +1,6 @@
+import 'package:arsys/faculty/views/home.dart';
 import 'package:arsys/login/view/login_view.dart';
 import 'package:arsys/student/views/home.dart';
-import 'package:arsys/views/faculty/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -22,7 +22,7 @@ class OnBoard extends StatelessWidget {
   }
 
   _homePageView(role) {
-    print("THIS IS ROLE : ${role}");
+    print("THIS IS ROLE : $role");
     if (role == "student") {
       return StudentHome();
     } else {

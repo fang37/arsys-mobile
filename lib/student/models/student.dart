@@ -1,4 +1,4 @@
-import 'package:arsys/faculty/model/faculty.dart';
+import 'package:arsys/faculty/models/faculty.dart';
 
 class Student {
   int? id;
@@ -38,8 +38,14 @@ class Student {
     status = json['status'] ?? "";
     phone = json['phone'] ?? "";
     email = json['email'] ?? "";
-    print(json['supervisor']);
-    supervisor = Faculty.fromJson(json['supervisor']);
+
+    if (json['supervisor'] != null) {
+      supervisor = Faculty.fromJson(json['supervisor']);
+    }
+  }
+
+  String getFullName() {
+    return "$firstName $lastName";
   }
 }
 

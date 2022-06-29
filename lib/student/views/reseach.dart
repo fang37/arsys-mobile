@@ -21,7 +21,7 @@ class _StudentResearchState extends State<StudentResearch> {
 
   @override
   void initState() {
-    researchC.researchUser();
+    researchC.researchListUser();
     super.initState();
   }
 
@@ -51,7 +51,7 @@ class _StudentResearchState extends State<StudentResearch> {
           : RefreshIndicator(
               displacement: 40,
               edgeOffset: 10,
-              onRefresh: refreshResearch,
+              onRefresh: refreshResearches,
               child: SafeArea(
                 child: Container(
                   padding: const EdgeInsets.all(15),
@@ -77,7 +77,7 @@ class _StudentResearchState extends State<StudentResearch> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15)),
                           child: FutureBuilder<dynamic>(
-                              future: researchC.researchUser(),
+                              future: researchC.researchListUser(),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
@@ -149,14 +149,11 @@ class _StudentResearchState extends State<StudentResearch> {
                                                         ),
                                                     child: ListTile(
                                                       onTap: () {
-                                                        print("CHECK LENGTH");
-                                                        print(snapshot
-                                                            .data[index]
-                                                            .supervisor);
                                                         Get.toNamed(
                                                             '/student-research-detail',
                                                             arguments: snapshot
-                                                                .data[index]);
+                                                                .data[index]
+                                                                .id);
                                                       },
                                                       contentPadding:
                                                           EdgeInsetsDirectional
@@ -258,21 +255,10 @@ class _StudentResearchState extends State<StudentResearch> {
     );
   }
 
-  Future refreshResearch() async {
-    researchC.research.clear();
-    researchC.researchUser();
+  Future refreshResearches() async {
+    researchC.researches.clear();
+    researchC.researchListUser();
     await Future.delayed(Duration(seconds: 2));
     setState(() {});
   }
-
-  // void logout() async {
-  //   var res = await Network().getData('/logout');
-  //   var body = json.decode(res.body);
-  //   if (body['success']) {
-  //     SharedPreferences localStorage = await SharedPreferences.getInstance();
-  //     localStorage.remove('user');
-  //     localStorage.remove('token');
-  //     Get.toNamed('/login');
-  //   }
-  // }
 }

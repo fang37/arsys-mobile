@@ -8,6 +8,8 @@ class Milestone {
   String? description;
   String? message;
 
+  bool proposeButton = false;
+
   Milestone.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     milestone = json['milestone'] ?? "";
@@ -17,6 +19,15 @@ class Milestone {
     status = json['status'] ?? -1;
     description = json['description'] ?? "";
     message = json['message'] ?? "";
+    proposeButton = proposeButtonAssigner(json['propose_button']);
+  }
+
+  bool proposeButtonAssigner(var button) {
+    if (button == null || button == "") {
+      return false;
+    } else {
+      return true;
+    }
   }
 }
 

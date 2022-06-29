@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:arsys/faculty/controllers/faculty_controller.dart';
 import 'package:arsys/firebase/fcm_controller.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
@@ -12,16 +13,16 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
-class StudentHome extends StatefulWidget {
+class FacultyHome extends StatefulWidget {
   @override
-  _StudentHomeState createState() => _StudentHomeState();
+  _FacultyHomeState createState() => _FacultyHomeState();
 }
 
-class _StudentHomeState extends State<StudentHome> {
+class _FacultyHomeState extends State<FacultyHome> {
   final fcmC = Get.find<FCMController>();
   final researchC = Get.find<ResearchController>();
   final eventC = Get.find<EventController>();
-  final profileC = Get.find<StudentController>();
+  final profileC = Get.find<FacultyController>();
   @override
   void initState() {
     researchC.researchListUser();
@@ -38,7 +39,7 @@ class _StudentHomeState extends State<StudentHome> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 1) {
-        Get.toNamed('/student-research');
+        Get.toNamed('/faculty-supervision');
       }
       if (_selectedNavbar == 2) {
         Get.toNamed('/student-event');

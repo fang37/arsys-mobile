@@ -1,4 +1,9 @@
 import 'package:arsys/authentication/authentication_manager.dart';
+import 'package:arsys/faculty/controllers/faculty_controller.dart';
+import 'package:arsys/faculty/controllers/supervision_controller.dart';
+import 'package:arsys/faculty/views/home.dart';
+import 'package:arsys/faculty/views/profile.dart';
+import 'package:arsys/faculty/views/supervision.dart';
 
 import 'package:arsys/login/view/login_view.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
@@ -12,9 +17,10 @@ import 'package:arsys/student/views/home.dart';
 import 'package:arsys/student/views/lecture.dart';
 import 'package:arsys/student/views/profile.dart';
 import 'package:arsys/student/views/reseach.dart';
+import 'package:arsys/student/views/research_event_report.dart';
 import 'package:arsys/student/views/research_detail.dart';
+import 'package:arsys/student/views/research_event.dart';
 import 'package:arsys/views/appbar.dart';
-import 'package:arsys/views/faculty/home.dart';
 import 'package:arsys/views/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -55,8 +61,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final fcmC = Get.put(FCMController());
     final eventC = Get.put(EventController());
-    final profileC = Get.put(StudentController());
+    final studentProfileC = Get.put(StudentController());
+    final facultyProfileC = Get.put(FacultyController());
     final researchC = Get.put(ResearchController());
+    final supervisionC = Get.put(SupervisionController());
     final lectureC = Get.put(LectureController());
     // final fcmC = Get.put(FCMController());
 
@@ -89,6 +97,16 @@ class MyApp extends StatelessWidget {
             transition: Transition.noTransition,
             transitionDuration: Duration.zero),
         GetPage(
+            name: '/student-research-event',
+            page: () => StudentResearchEvent(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/student-research-event-report',
+            page: () => StudentResearchEventReport(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
             name: '/student-event',
             page: () => StudentEvent(),
             transition: Transition.noTransition,
@@ -106,6 +124,16 @@ class MyApp extends StatelessWidget {
         GetPage(
             name: '/student-profile',
             page: () => StudentProfile(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/faculty-profile',
+            page: () => FacultyProfile(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/faculty-supervision',
+            page: () => FacultySupervision(),
             transition: Transition.noTransition,
             transitionDuration: Duration.zero),
         GetPage(name: '/login', page: () => LoginView()),

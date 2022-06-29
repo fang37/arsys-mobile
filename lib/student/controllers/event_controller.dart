@@ -3,15 +3,20 @@ import 'dart:convert';
 import 'package:arsys/student/models/event.dart';
 import 'package:arsys/network/network.dart';
 import 'package:arsys/network/event_provider.dart';
+import 'package:arsys/student/models/event_applicant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/research.dart';
+
 class EventController extends GetxController {
   var event = List<Event>.empty().obs;
   var events = List<Event>.empty().obs;
+  var applicableEvents = List<Event>.empty().obs;
+  var eventApplicants = List<EventApplicant>.empty().obs;
   var event_name = {
     1: 'Pre-defense',
     2: 'Final-defense',
@@ -102,6 +107,94 @@ class EventController extends GetxController {
     return (events);
   }
 
+  Future getApplicableEvent(int id) async {
+    if (applicableEvents.value.isEmpty) {
+      var response;
+      response = await Network().getApplicableEventById(id);
+      // print(response.bodyString);
+      var body;
+
+      try {
+        body = await json.decode(response.bodyString);
+      } catch (e) {
+        print(e);
+        return applicableEvents;
+      }
+
+      try {
+        if (response.statusCode == HttpStatus.ok) {
+          applicableEvents.value.clear();
+          var bodies = body['event'];
+          for (var item in bodies) {
+            applicableEvents.add(Event.fromJson(item));
+          }
+        }
+        return (applicableEvents);
+      } catch (e) {
+        print(e);
+      }
+    }
+    return (applicableEvents);
+  }
+
+  Future getEventApplicant(int id) async {
+    var response;
+    response = await Network().getEventApplicantById(id);
+    // print(response.bodyString);
+    var body;
+
+    try {
+      body = await json.decode(response.bodyString);
+    } catch (e) {
+      print(e);
+      return eventApplicants;
+    }
+
+    try {
+      if (response.statusCode == HttpStatus.ok) {
+        eventApplicants.value.clear();
+        var bodies = body['applicant'];
+        for (var item in bodies) {
+          eventApplicants.add(EventApplicant.fromJson(item));
+        }
+      }
+      return (eventApplicants);
+    } catch (e) {
+      print(e);
+    }
+
+    return (eventApplicants);
+  }
+
+  Future<bool> applyEvent(Research res, int eventId) async {
+    if (res.id != null && res.getEventType() == EventType.preDefense ||
+        res.getEventType() == EventType.finalDefense) {
+      var response;
+      response = await Network().applyEvent(res.id, eventId);
+      // print(response.bodyString);
+
+      var body;
+
+      try {
+        body = await json.decode(response.bodyString);
+      } catch (e) {
+        print(e);
+        return false;
+      }
+
+      try {
+        if (response.statusCode == HttpStatus.ok) {
+          print(res);
+          return true;
+        }
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    }
+    return false;
+  }
+
   // Future refreshEvent() async {
   //   event.clear();
   //   events.clear();
@@ -145,7 +238,7 @@ class EventController extends GetxController {
   Color timelineColor(String date) {
     if (date != null && date != "") {
       var inputFormat = DateFormat('dd-MM-yyyy HH:mm');
-      var inputDate = inputFormat.parse(date!);
+      var inputDate = inputFormat.parse(date);
 
       var outputFormat = DateFormat('dd-MM-yyyy');
 

@@ -42,6 +42,22 @@ class Faculty {
     phone = json['phone'] ?? "";
     email = json['email'] ?? "";
   }
+
+  Faculty.codeOnlyFromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    code = json['code'] ?? "";
+  }
+
+  String getFullNameAndTitle() {
+    String fullName = '$firstName $lastName';
+    if (frontTitle != '') {
+      fullName = '$frontTitle $fullName';
+    }
+    if (rearTitle != '') {
+      fullName = '$fullName, $rearTitle';
+    }
+    return fullName;
+  }
 }
 
 var _specializationName = {

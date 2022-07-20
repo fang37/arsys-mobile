@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:arsys/controllers/user_controller.dart';
 import 'package:arsys/firebase/fcm_controller.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
-import 'package:arsys/student/controllers/student_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:arsys/network/network.dart';
@@ -21,7 +21,7 @@ class _StudentHomeState extends State<StudentHome> {
   final fcmC = Get.find<FCMController>();
   final researchC = Get.find<ResearchController>();
   final eventC = Get.find<EventController>();
-  final profileC = Get.find<StudentController>();
+  final profileC = Get.find<UserController>();
   @override
   void initState() {
     researchC.researchListUser();

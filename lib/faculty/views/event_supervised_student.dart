@@ -1,31 +1,43 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:arsys/controllers/user_controller.dart';
 import 'package:arsys/faculty/controllers/supervision_controller.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
+import 'package:arsys/student/models/event_applicant.dart';
 import 'package:arsys/student/models/research.dart';
+import 'package:arsys/student/models/spv.dart';
+import 'package:arsys/student/models/supervisor_score.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:arsys/network/network.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
-class FacultySupervision extends StatefulWidget {
+class FacultyEventSupervisedStudent extends StatefulWidget {
   @override
-  _FacultySupervisionState createState() => _FacultySupervisionState();
+  _FacultyEventSupervisedStudentState createState() =>
+      _FacultyEventSupervisedStudentState();
 }
 
-class _FacultySupervisionState extends State<FacultySupervision> {
+class _FacultyEventSupervisedStudentState
+    extends State<FacultyEventSupervisedStudent> {
   final researchC = Get.find<SupervisionController>();
+  final eventC = Get.find<EventController>();
+  final userC = Get.find<UserController>();
+  int eventId = Get.arguments;
 
   @override
   void initState() {
-    researchC.researchListUser();
+    print("BUILD ITEM APPLICANT ++++++++++");
+    print(eventC.getSupervisedApplicantByEvent(eventId));
+
     super.initState();
   }
 
-  int _selectedNavbar = 1;
+  int _selectedNavbar = 2;
   void _changeSelectedNavBar(int index) {
     setState(() {
       _selectedNavbar = index;
@@ -62,7 +74,7 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                       const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          'Supervision',
+                          'Supervised Student',
                           style: TextStyle(
                               color: Color(0xff3A4856),
                               fontSize: 20,
@@ -71,8 +83,9 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                         ),
                       ),
                       Flexible(
-                        child: FutureBuilder<List<Research>>(
-                            future: researchC.researchListUser(),
+                        child: FutureBuilder<dynamic>(
+                            future:
+                                eventC.getSupervisedApplicantByEvent(eventId),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -81,15 +94,36 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                 );
                               } else if (!snapshot.hasData) {
                                 return const Expanded(
-                                    child: Center(child: Text('No Research')));
+                                    child: Center(
+                                        child: Text('No Supervised Student')));
                               } else {
+                                List<EventApplicant>? applicants =
+                                    List.empty(growable: true);
+
+                                applicants = snapshot.data;
+                                var supervisedApplicants = applicants
+                                    ?.where((applicant) => applicant.research!
+                                        .isSupervisor(userC.getId()))
+                                    .cast<EventApplicant?>();
+
+                                // print(applicant);
+                                // print(applicants?.where((applicant) => applicant
+                                //     .research!.supervisor!
+                                //     .where((faculty) => faculty.id == 3)
+                                //     .isNotEmpty));
+
                                 return Scrollbar(
                                   interactive: true,
                                   child: ListView.builder(
                                       physics: const BouncingScrollPhysics(),
                                       shrinkWrap: true,
-                                      itemCount: snapshot.data?.length,
+                                      itemCount: supervisedApplicants?.length,
                                       itemBuilder: (context, index) {
+                                        EventApplicant? applicant =
+                                            supervisedApplicants
+                                                ?.elementAt(index);
+                                        SPV? spv = applicant?.research
+                                            ?.getSPV(userC.getId());
                                         return Expanded(
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(
@@ -98,7 +132,7 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                               elevation: 2,
                                               color: Colors.white,
                                               // color: researchC.cardColorBuilder(
-                                              //     snapshot.data[index].milestone
+                                              //     applicant[index].milestone
                                               //         .milestone),
                                               shape: RoundedRectangleBorder(
                                                   borderRadius:
@@ -117,13 +151,7 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                                     child: InkWell(
                                                       splashColor:
                                                           Colors.lightBlue[100],
-                                                      onTap: () {
-                                                        Get.toNamed(
-                                                            '/faculty-supervision-detail',
-                                                            arguments: snapshot
-                                                                .data?[index]
-                                                                .id);
-                                                      },
+                                                      onTap: () {},
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -135,7 +163,7 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                                           children: [
                                                             Center(
                                                               child: Text(
-                                                                  "${snapshot.data![index].milestone?.description}",
+                                                                  "${applicant?.research?.researchCode}",
                                                                   style: const TextStyle(
                                                                       fontSize:
                                                                           14,
@@ -159,7 +187,11 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                                                       0,
                                                                       0),
                                                               child: Text(
-                                                                  "${snapshot.data![index].student?.getFullName()}",
+                                                                  "${applicant?.research?.student?.getFullName()}",
+                                                                  maxLines: 2,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
                                                                   style: const TextStyle(
                                                                       fontSize:
                                                                           18,
@@ -176,7 +208,7 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                                                   EdgeInsets
                                                                       .all(8),
                                                               child: Text(
-                                                                  "${snapshot.data?[index].student?.studentNumber} - ${snapshot.data?[index].student?.specialization}",
+                                                                  "${applicant?.research?.student?.studentNumber} - ${applicant?.research?.student?.specialization}",
                                                                   style: const TextStyle(
                                                                       fontFamily:
                                                                           'Helvetica',
@@ -190,49 +222,50 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                                               child: Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
-                                                                        .spaceBetween,
+                                                                        .center,
                                                                 children: [
-                                                                  Container(
-                                                                      padding: EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              8,
-                                                                          vertical:
-                                                                              5),
-                                                                      decoration: BoxDecoration(
-                                                                          color: researchC.cardColorBuilder(snapshot.data?[index].milestone?.milestone ??
-                                                                              ""),
-                                                                          borderRadius: BorderRadius.circular(
-                                                                              10.0)),
-                                                                      child: Text(
-                                                                          "${snapshot.data?[index].milestone?.milestone}",
-                                                                          style: TextStyle(
-                                                                              fontSize: 14,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontFamily: 'OpenSans',
-                                                                              color: Color(0xff3A4856)))),
+                                                                  const Text(
+                                                                      "MARK",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontFamily:
+                                                                              'OpenSans',
+                                                                          color:
+                                                                              Color(0xff3A4856))),
                                                                   Padding(
                                                                     padding: const EdgeInsets
                                                                             .only(
                                                                         left:
                                                                             5),
-                                                                    child: Container(
-                                                                        padding: EdgeInsets.symmetric(
-                                                                            horizontal:
-                                                                                8,
-                                                                            vertical:
-                                                                                5),
-                                                                        decoration: BoxDecoration(
-                                                                            color: Colors.blueGrey[
-                                                                                50],
-                                                                            borderRadius: BorderRadius.circular(
-                                                                                10.0)),
-                                                                        child: Text(
-                                                                            "${snapshot.data?[index].milestone?.phase}",
-                                                                            style: TextStyle(
-                                                                                fontSize: 14,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                fontFamily: 'OpenSans',
-                                                                                color: Color(0xff3A4856)))),
+                                                                    child:
+                                                                        InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        if (spv !=
+                                                                            null) {
+                                                                          inputMarkModal(spv
+                                                                              .supervisorScore
+                                                                              ?.first);
+                                                                        }
+                                                                      },
+                                                                      child: Container(
+                                                                          padding: EdgeInsets.symmetric(
+                                                                              horizontal:
+                                                                                  8,
+                                                                              vertical:
+                                                                                  5),
+                                                                          decoration: BoxDecoration(
+                                                                              color: Colors.blueGrey[
+                                                                                  50],
+                                                                              borderRadius: BorderRadius.circular(
+                                                                                  10.0)),
+                                                                          child: Text(
+                                                                              "${applicant?.research?.getSupervisorScore(userC.getId()) ?? 'Unmarked'}",
+                                                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'OpenSans', color: Color(0xff3A4856)))),
+                                                                    ),
                                                                   ),
                                                                 ],
                                                               ),
@@ -245,7 +278,7 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                                                   const EdgeInsets
                                                                       .all(3.0),
                                                               child: Text(
-                                                                  "${snapshot.data?[index].title}",
+                                                                  "${applicant?.research?.title}",
                                                                   overflow:
                                                                       TextOverflow
                                                                           .fade,
@@ -265,76 +298,7 @@ class _FacultySupervisionState extends State<FacultySupervision> {
                                                         ),
                                                       ),
                                                     ),
-                                                  )
-
-                                                  // ListTile(
-                                                  //   onTap: () {
-                                                  //     Get.toNamed(
-                                                  //         '/student-research-detail',
-                                                  //         arguments: snapshot
-                                                  //             .data[index].id);
-                                                  //   },
-                                                  //   contentPadding:
-                                                  //       EdgeInsetsDirectional
-                                                  //           .fromSTEB(
-                                                  //               10, 10, 16, 10),
-                                                  //   isThreeLine: true,
-                                                  //   title: Text(
-                                                  //       snapshot.data[index]
-                                                  //           .researchName,
-                                                  //       style: TextStyle(
-                                                  //           fontSize: 24,
-                                                  //           fontFamily:
-                                                  //               'OpenSans',
-                                                  //           fontWeight:
-                                                  //               FontWeight.w700,
-                                                  //           color:
-                                                  //               Colors.white)),
-                                                  //   subtitle: Text(
-                                                  //     "${snapshot.data[index].milestone.milestone} \n${snapshot.data[index].milestone.description}",
-                                                  //     style: TextStyle(
-                                                  //         fontFamily:
-                                                  //             'OpenSans'),
-                                                  //   ),
-                                                  //   leading:
-                                                  //       researchC.iconBuilder(
-                                                  //           snapshot.data[index]
-                                                  //               .researchType,
-                                                  //           65,
-                                                  //           index,
-                                                  //           snapshot
-                                                  //               .data[index]
-                                                  //               .milestone
-                                                  //               .milestone),
-                                                  //   trailing: Column(
-                                                  //     mainAxisAlignment:
-                                                  //         MainAxisAlignment
-                                                  //             .center,
-                                                  //     children: [
-                                                  //       Text(
-                                                  //         snapshot.data[index]
-                                                  //             .milestone.phase,
-                                                  //         style: TextStyle(
-                                                  //             fontSize: 16,
-                                                  //             fontStyle:
-                                                  //                 FontStyle
-                                                  //                     .italic,
-                                                  //             fontFamily:
-                                                  //                 'OpenSans',
-                                                  //             color:
-                                                  //                 Colors.white),
-                                                  //       ),
-                                                  //     ],
-                                                  //   ),
-                                                  //   shape:
-                                                  //       RoundedRectangleBorder(
-                                                  //           borderRadius:
-                                                  //               BorderRadius
-                                                  //                   .circular(
-                                                  //                       15)),
-                                                  //   // tileColor: Colors.lightBlueAccent[100],
-                                                  // ),
-                                                  ),
+                                                  )),
                                             ),
                                           ),
                                         );
@@ -365,6 +329,103 @@ class _FacultySupervisionState extends State<FacultySupervision> {
         initialActiveIndex: _selectedNavbar,
         onTap: _changeSelectedNavBar,
       ),
+    );
+  }
+
+  void inputMarkModal(SupervisorScore? spv) {
+    TextEditingController markController = TextEditingController();
+    TextEditingController notesController = TextEditingController();
+    Get.defaultDialog(
+      contentPadding: const EdgeInsets.all(20),
+      title: 'Input Mark',
+      titleStyle: const TextStyle(
+          fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xff3A4856)),
+      titlePadding: const EdgeInsets.only(top: 15),
+      content: Column(
+        children: [
+          Form(
+            autovalidateMode: AutovalidateMode.always,
+            child: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter mark';
+                } else if (int.parse(value) < 0 || int.parse(value) > 400) {
+                  return 'Mark must be between 0 and 400';
+                }
+                return null;
+              },
+              maxLength: 3,
+              controller: markController,
+              decoration: const InputDecoration(
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+                labelText: "Input mark",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                filled: true,
+              ),
+            ),
+          ),
+          Form(
+            autovalidateMode: AutovalidateMode.always,
+            child: TextFormField(
+              controller: notesController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+                labelText: "Input seminar's notes",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                filled: true,
+              ),
+            ),
+          ),
+        ],
+      ),
+      textCancel: 'Cancel',
+      textConfirm: 'Submit',
+      confirm: InkWell(
+        onTap: () {
+          eventC.setSupervisorMark(
+              spv!.supervisorId,
+              spv.eventId,
+              spv.applicantId,
+              int.parse(markController.text),
+              notesController.text);
+          Get.back();
+          setState(() {});
+        },
+        child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+                color: Colors.redAccent,
+                borderRadius: BorderRadius.circular(8.0)),
+            child: const Text(
+              "Submit",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'OpenSans',
+                  fontWeight: FontWeight.bold),
+            )),
+      ),
+      cancel: InkWell(
+        onTap: (() => Get.back()),
+        child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+                color: Colors.grey, borderRadius: BorderRadius.circular(8.0)),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'OpenSans',
+                  fontWeight: FontWeight.bold),
+            )),
+      ),
+      radius: 15,
     );
   }
 

@@ -1,52 +1,109 @@
 import 'package:arsys/faculty/models/faculty.dart';
+import 'package:arsys/student/models/defense_examiner.dart';
 import 'package:arsys/student/models/event.dart';
+import 'package:arsys/student/models/examiner.dart';
+import 'package:arsys/student/models/research.dart';
+import 'package:arsys/student/models/seminar_examiner.dart';
 
 class EventApplicant {
   int id = -1;
+  int researchId = -1;
   Event? event;
+  Research? research;
   Space? space;
   Session? session;
-  List<Faculty>? examiner = <Faculty>[];
+  List<Examiner>? examiner = <Examiner>[];
 
   EventApplicant.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    event = Event.fromJson(json['event']);
+    researchId = json['research_id'];
+    if (json['event'] != null) {
+      event = Event.fromJson(json['event']);
+    }
+    if (json['research'] != null) {
+      research = Research.fromJson(json['research']);
+    }
     space = json['space'] == null
         ? Space.nullFromJson()
         : Space.fromJson(json['space']);
     session = json['session'] == null
         ? Session.nullFromJson()
         : Session.fromJson(json['session']);
+
     if (json['examiner'] != null) {
-      for (var item in json['examiner']) {
-        examiner!.add(Faculty.codeOnlyFromJson(item['faculty']));
+      if (event?.eventType == Type.preDefense.id) {
+        for (var ex in json['examiner']) {
+          examiner?.add(DefenseExaminer.fromJson(ex));
+        }
+      } else if (event?.eventType == Type.finalDefense.id ||
+          event?.eventType == Type.eeSeminar.id) {
+        for (var ex in json['examiner']) {
+          examiner?.add(SeminarExaminer.fromJson(ex));
+        }
       }
     }
+
+    print("EVENT APPLICANT COMPLETED CREATED");
   }
+
+  EventApplicant.researchOnlyFromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    researchId = json['research_id'];
+    print("EVENT APPLICANT RESEARCH ONLY COMPLETED CREATED");
+  }
+
+// TODO: MAKE UNIVERSAL GET EXAMINER
+  // List<Examiner> getExaminer() {
+  //   List<Examiner>? examiner;
+  //   if (event?.eventType == Type.finalDefense.id ||
+  //       event?.eventType == Type.eeSeminar.id) {
+  //     if (event?.room != null) {
+  //       for (var room in event!.room!) {
+  //         for (Examiner ex in room.examiner!) {
+  //           examiner.add(ex)
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   String getExaminerCode() {
     String code = "-";
-    for (Faculty ex in examiner!) {
+    for (Examiner ex in examiner!) {
       if (code == "-") {
-        code = ex.code!;
+        code = ex.faculty!.code!;
       } else {
-        code = code + " - " + ex.code!;
+        code = code + " - " + ex.faculty!.code!;
+      }
+    }
+    if (event?.eventType == Type.finalDefense.id ||
+        event?.eventType == Type.eeSeminar.id) {
+      if (event?.room != null) {
+        for (var room in event!.room!) {
+          for (Examiner ex in room.examiner!) {
+            if (code == "-") {
+              code = ex.faculty!.code!;
+            } else {
+              code = code + " - " + ex.faculty!.code!;
+            }
+          }
+        }
       }
     }
     return code;
   }
 
-  String getSupervisorCode() {
-    String code = "-";
-    for (Faculty ex in examiner!) {
-      if (code == "-") {
-        code = ex.code!;
-      } else {
-        code = code + " - " + ex.code!;
-      }
-    }
-    return code;
-  }
+  // String getSupervisorCode() {
+  //   String code = "-";
+  //   for (Faculty ex in examiner!) {
+  //     if (code == "-") {
+  //       code = ex.code!;
+  //     } else {
+  //       code = code + " - " + ex.code!;
+  //     }
+  //   }
+  //   return code;
+  // }
 
   String getShareableScheduleLink() {
     String result =

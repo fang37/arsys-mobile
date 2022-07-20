@@ -109,7 +109,7 @@ class _StudentResearchEventReportState
                                 padding: const EdgeInsets.all(8.0),
                                 child: FutureBuilder<dynamic>(
                                     future:
-                                        eventC.getEventApplicant(researchId),
+                                        eventC.getEventApplicantByResearch(researchId),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {

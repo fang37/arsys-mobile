@@ -4,6 +4,7 @@ import 'package:arsys/student/models/event.dart';
 import 'package:arsys/network/network.dart';
 import 'package:arsys/network/event_provider.dart';
 import 'package:arsys/student/models/event_applicant.dart';
+import 'package:arsys/student/models/examiner.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/status/http_status.dart';
@@ -17,6 +18,7 @@ class EventController extends GetxController {
   var events = List<Event>.empty().obs;
   var applicableEvents = List<Event>.empty().obs;
   var eventApplicants = List<EventApplicant>.empty().obs;
+  Event? seminarRoomApplicant;
   var event_name = {
     1: 'Pre-defense',
     2: 'Final-defense',
@@ -108,6 +110,7 @@ class EventController extends GetxController {
   }
 
   Future getApplicableEvent(int id) async {
+    applicableEvents.clear();
     if (applicableEvents.value.isEmpty) {
       var response;
       response = await Network().getApplicableEventById(id);
@@ -137,9 +140,39 @@ class EventController extends GetxController {
     return (applicableEvents);
   }
 
-  Future getEventApplicant(int id) async {
+  Future getEventApplicantByResearch(int researchId) async {
     var response;
-    response = await Network().getEventApplicantById(id);
+    response = await Network().getEventApplicantByResearchId(researchId);
+    // print(response.bodyString);
+    var body;
+
+    try {
+      body = await json.decode(response.bodyString);
+    } catch (e) {
+      print(e);
+      return eventApplicants;
+    }
+
+    try {
+      if (response.statusCode == HttpStatus.ok) {
+        eventApplicants.value.clear();
+        var bodies = body['applicant'];
+        print(bodies);
+        for (var item in bodies) {
+          eventApplicants.add(EventApplicant.fromJson(item));
+        }
+      }
+      return (eventApplicants);
+    } catch (e) {
+      print(e);
+    }
+
+    return (eventApplicants);
+  }
+
+  Future getEventApplicantByEvent(int eventId) async {
+    var response;
+    response = await Network().getEventApplicantByEventId(eventId);
     // print(response.bodyString);
     var body;
 
@@ -166,6 +199,62 @@ class EventController extends GetxController {
     return (eventApplicants);
   }
 
+  Future getSupervisedApplicantByEvent(int eventId) async {
+    var response;
+    response = await Network().getSupervisedApplicantByEventId(eventId);
+    // print(response.bodyString);
+    var body;
+
+    try {
+      body = await json.decode(response.bodyString);
+    } catch (e) {
+      print(e);
+      return eventApplicants;
+    }
+
+    try {
+      if (response.statusCode == HttpStatus.ok) {
+        eventApplicants.value.clear();
+        var bodies = body['applicants'];
+        for (var item in bodies) {
+          eventApplicants.add(EventApplicant.fromJson(item));
+        }
+      }
+      return (eventApplicants);
+    } catch (e) {
+      print(e);
+    }
+
+    return (eventApplicants);
+  }
+
+  Future getSeminarRoomApplicantByEvent(int eventId) async {
+    var response;
+    response = await Network().getSeminarRoomApplicantByEventId(eventId);
+    // print(response.bodyString);
+    var body;
+
+    try {
+      body = await json.decode(response.bodyString);
+    } catch (e) {
+      print(e);
+      return seminarRoomApplicant;
+    }
+
+    try {
+      if (response.statusCode == HttpStatus.ok) {
+        if (body['event'] != null) {
+          seminarRoomApplicant = Event.fromJson(body['event']);
+        }
+      }
+      return (seminarRoomApplicant);
+    } catch (e) {
+      print(e);
+    }
+
+    return (seminarRoomApplicant);
+  }
+
   Future<bool> applyEvent(Research res, int eventId) async {
     if (res.id != null && res.getEventType() == EventType.preDefense ||
         res.getEventType() == EventType.finalDefense) {
@@ -185,6 +274,106 @@ class EventController extends GetxController {
       try {
         if (response.statusCode == HttpStatus.ok) {
           print(res);
+          return true;
+        }
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  Future<bool> setPresenceRoomExaminer(
+      List<bool> newPresence, List<Examiner>? examiners) async {
+    print("RIGHT HERE");
+    var resultResponses = List<bool>.empty(growable: true);
+    if (newPresence != null && examiners != null) {
+      if (newPresence.length == examiners.length) {
+        for (int index = 0; index < examiners.length; index++) {
+          if (examiners[index].presence != newPresence[index]) {
+            var response;
+            response = await Network().setPresenceRoomExaminer(
+                examiners[index].id, newPresence[index]);
+            print(response.bodyString);
+            var body;
+
+            try {
+              body = await json.decode(response.bodyString);
+            } catch (e) {
+              print(e);
+              resultResponses.add(false);
+            }
+
+            try {
+              if (response.statusCode == HttpStatus.ok) {
+                resultResponses.add(true);
+              }
+            } catch (e) {
+              print(e);
+              resultResponses.add(false);
+            }
+          }
+        }
+        return resultResponses.every((element) => element == true);
+      }
+    }
+    return false;
+  }
+
+  Future<bool> setMarkRoomExaminer(
+      int scoreId, int mark, String? seminarNotes) async {
+    print("RIGHT HERE");
+
+    if (scoreId != null && mark != null) {
+      var response;
+      response = await Network()
+          .setMarkRoomExaminer(scoreId, mark, seminarNotes ?? "");
+      // print(response.bodyString);
+
+      var body;
+
+      try {
+        body = await json.decode(response.bodyString);
+      } catch (e) {
+        print(e);
+        return false;
+      }
+
+      try {
+        if (response.statusCode == HttpStatus.ok) {
+          return true;
+        }
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  Future<bool> setSupervisorMark(int supervisorId, int eventId, int applicantId,
+      int mark, String? seminarNotes) async {
+    if (supervisorId != null &&
+        eventId != null &&
+        applicantId != null &&
+        mark != null) {
+      var response;
+      response = await Network().setSupervisorMark(
+          supervisorId, eventId, applicantId, mark, seminarNotes ?? "");
+      // print(response.bodyString);
+
+      var body;
+
+      try {
+        body = await json.decode(response.bodyString);
+      } catch (e) {
+        print(e);
+        return false;
+      }
+
+      try {
+        if (response.statusCode == HttpStatus.ok) {
           return true;
         }
       } catch (e) {
@@ -224,14 +413,14 @@ class EventController extends GetxController {
   }
 
   TextStyle rowStyle() {
-    return TextStyle(fontSize: 15, fontFamily: "Helvetica");
+    return TextStyle(fontSize: 16, fontFamily: "OpenSans");
   }
 
   TextStyle headStyle() {
     return TextStyle(
         color: Colors.white,
-        fontSize: 15,
-        fontFamily: "Helvetica",
+        fontSize: 16,
+        fontFamily: "OpenSans",
         fontWeight: FontWeight.bold);
   }
 

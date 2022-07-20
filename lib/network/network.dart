@@ -69,6 +69,24 @@ class Network extends GetConnect {
     }
   }
 
+  approveDefense(int? approvalId) async {
+    if (approvalId != null) {
+      var data = {'id': approvalId};
+      await _getToken();
+      var fullUrl = arsysUrl("research-approve");
+      try {
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   applyEvent(int? researchId, int? eventId) async {
     if (researchId != null) {
       var data = {'research_id': researchId, 'event_id': eventId};
@@ -120,6 +138,75 @@ class Network extends GetConnect {
       await _getToken();
       var fullUrl = arsysUrl("research-defense-report");
       try {
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  setPresenceRoomExaminer(int? id, bool newPresence) async {
+    if (id != null) {
+      int presenceInInt = newPresence ? 1 : 0;
+      var data = {'id': '$id', 'presence': '$presenceInInt'};
+      await _getToken();
+      var fullUrl = arsysUrl("event-applicant/room/presence");
+      try {
+        print("$data");
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  setMarkRoomExaminer(int scoreId, int mark, String? seminarNotes) async {
+    if (scoreId != null) {
+      var data = {
+        'score_id': '$scoreId',
+        'mark': '$mark',
+        'seminar_notes': '$seminarNotes'
+      };
+      await _getToken();
+      var fullUrl = arsysUrl("event-applicant/room/score");
+      try {
+        print("$data");
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  setSupervisorMark(int supervisorId, int eventId, int applicantId, int mark,
+      String? seminarNotes) async {
+    if (mark != null) {
+      var data = {
+        'supervisor_id': '$supervisorId',
+        'event_id': '$eventId',
+        'applicant_id': '$applicantId',
+        'mark': '$mark',
+        'seminar_notes': '$seminarNotes'
+      };
+      await _getToken();
+      var fullUrl = arsysUrl("event-applicant/supervisor/score");
+      try {
+        print("$data");
         return post(fullUrl, jsonEncode(data), headers: _setHeaders());
         // return await http.post(Uri.parse(fullUrl),
         //     body: jsonEncode(data), headers: _setHeaders());
@@ -193,11 +280,36 @@ class Network extends GetConnect {
     return get(arsysUrl("event-applicable/$id"), headers: _setHeaders());
   }
 
-  // EVENT EVENT BY RESEARCH ID
-  Future<Response> getEventApplicantById(int id) async {
+  // EVENT APPLICANT BY RESEARCH ID
+  Future<Response> getEventApplicantByResearchId(int researchId) async {
     await _getToken();
-    print("GET APPLICABLE EVENT");
-    return get(arsysUrl("event-applicant/$id"), headers: _setHeaders());
+    print("GET EVENT APPLICANT BY RESEARCH ID");
+    return get(arsysUrl("event-applicant/research/$researchId"),
+        headers: _setHeaders());
+  }
+
+  // EVENT APPLICANT BY EVENT ID
+  Future<Response> getEventApplicantByEventId(int eventId) async {
+    await _getToken();
+    print("GET EVENT APPLICANT BY EVENT ID");
+    return get(arsysUrl("event-applicant/event/$eventId"),
+        headers: _setHeaders());
+  }
+
+  // EVENT APPLICANT BY EVENT ID
+  Future<Response> getSupervisedApplicantByEventId(int eventId) async {
+    await _getToken();
+    print("GET SUPERVISED APPLICANT BY EVENT ID");
+    return get(arsysUrl("event-applicant/event/supervisor/$eventId"),
+        headers: _setHeaders());
+  }
+
+  // SEMINAR ROOM APPLICANT BY EVENT ID
+  Future<Response> getSeminarRoomApplicantByEventId(int eventId) async {
+    await _getToken();
+    print("GET SEMINAR ROOM APPLICANT BY EVENT ID");
+    return get(arsysUrl("event-applicant/room/event/$eventId"),
+        headers: _setHeaders());
   }
 
   // RESEARCH

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:arsys/authentication/authentication_manager.dart';
-import 'package:arsys/faculty/controllers/faculty_controller.dart';
+import 'package:arsys/controllers/user_controller.dart';
+import 'package:arsys/models/role.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
-import 'package:arsys/student/controllers/student_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:arsys/network/network.dart';
@@ -14,7 +14,7 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 // final authC = Get.find<AuthController>();
 AuthenticationManager _authManager = Get.find();
 String activeRole = _authManager.activeRole;
-final profileC = Get.find<FacultyController>();
+final profileC = Get.find<UserController>();
 
 PreferredSize HomeAppBarBuilder(context) {
   return PreferredSize(
@@ -71,9 +71,10 @@ PreferredSize HomeAppBarBuilder(context) {
           // color: Colors.lime,
           child: InkWell(
             onTap: () {
-              if (activeRole == 'student') {
+              if (profileC.user.getRole() == Role.student.value) {
                 Get.toNamed('/student-profile');
-              } else if (activeRole == 'faculty' || activeRole == 'admin') {
+              } else if (profileC.user.getRole() == Role.faculty.value ||
+                  profileC.user.getRole() == Role.admin.value) {
                 Get.toNamed('/faculty-profile');
               }
             },
@@ -111,7 +112,7 @@ PreferredSize HomeAppBarBuilder(context) {
                           children: [
                             Flexible(
                               child: Text(
-                                profileC.getFullName(),
+                                profileC.user.getProfileName(),
                                 style: TextStyle(
                                     fontSize: 24,
                                     fontFamily: 'OpenSans',
@@ -121,8 +122,7 @@ PreferredSize HomeAppBarBuilder(context) {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Text(profileC.getRole(),
-                                // TODO: Gabung profile jadi satu
+                            Text(profileC.user.getRoleName(),
                                 style: TextStyle(
                                   height: 0.9,
                                   fontSize: 15,
@@ -218,14 +218,14 @@ AppBar AppBarBuilder() {
                   FittedBox(
                     fit: BoxFit.fitWidth,
                     child: Text(
-                      profileC.getFullName(),
+                      profileC.user.getProfileName(),
                       style: TextStyle(
                         fontFamily: 'Helvetica',
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  Text(profileC.getRole(),
+                  Text(profileC.user.getRoleName(),
                       style: TextStyle(
                         fontSize: 15,
                         color: Colors.blue[100],

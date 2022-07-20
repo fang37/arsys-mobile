@@ -68,6 +68,9 @@ class _StudentResearchDetailState extends State<StudentResearchDetail> {
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
+                        } else if (!snapshot.hasData) {
+                          return const Expanded(
+                              child: Center(child: Text('No Detail')));
                         } else {
                           research = researchC.research;
                           return Column(

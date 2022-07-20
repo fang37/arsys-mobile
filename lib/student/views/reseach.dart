@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
-import 'package:arsys/student/controllers/student_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';

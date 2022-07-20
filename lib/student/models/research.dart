@@ -2,7 +2,9 @@ import 'package:arsys/faculty/models/faculty.dart';
 import 'package:arsys/student/models/defense_approval.dart';
 import 'package:arsys/student/models/milestone.dart';
 import 'package:arsys/student/models/proposal_review.dart';
+import 'package:arsys/student/models/spv.dart';
 import 'package:arsys/student/models/student.dart';
+import 'package:arsys/student/models/supervisor_score.dart';
 import 'package:arsys/student/models/turnitin.dart';
 import 'package:get/get.dart';
 
@@ -25,6 +27,7 @@ class Research {
 
   Student? student;
   List<Faculty>? supervisor = <Faculty>[];
+  List<SPV>? spv = <SPV>[];
   Milestone? milestone;
   List<DefenseApproval>? defenseApproval = <DefenseApproval>[];
   List<ProposalReview>? proposalReview = <ProposalReview>[];
@@ -55,20 +58,31 @@ class Research {
     id = json['id'];
     researchType = json['research_type'] ?? -1;
     researchName = getResearchName(json['research_type'] ?? -1);
-    researchCode = json['research_code'];
-    title = json['title'];
-    abstract = json['abstract'];
+    researchCode = json['research_code'] ?? "";
+    title = json['title'] ?? "";
+    abstract = json['abstract'] ?? "";
     researchMilestone = json['research_milestone'] ?? -1;
     status = json['status'] ?? -1;
-    approvalDate = json['approval_date'];
-    milestone = Milestone.fromJson(json['milestone']);
-    for (var item in json['supervisor']) {
+    approvalDate = json['approval_date'] ?? "";
+    if (json['student'] != null) {
+      student = Student.fromJson(json['student']);
+    }
+    if (json['milestone'] != null) {
+      milestone = Milestone.fromJson(json['milestone']);
+    }
+    for (var item in json['supervisor'] ?? []) {
       supervisor!.add(Faculty.fromJson(item['faculty']));
     }
-    for (var item in json['defense_approval']) {
+    for (var item in json['supervisor'] ?? []) {
+      spv!.add(SPV.fromJson(item));
+    }
+    // print(supervisor![0].id);
+
+    for (var item in json['defense_approval'] ?? []) {
       defenseApproval!.add(DefenseApproval.fromJson(item));
     }
-    for (var item in json['proposal_review']) {
+
+    for (var item in json['proposal_review'] ?? []) {
       proposalReview!.add(ProposalReview.fromJson(item));
     }
     siasPro = siasStatusAssigner(json['s_i_a_s_pro']);
@@ -105,9 +119,14 @@ class Research {
     researchMilestone = json['research_milestone'] ?? -1;
     status = json['status'] ?? -1;
     approvalDate = json['approval_date'];
-    print("Here");
     milestone = Milestone.fromJson(json['milestone']);
     student = Student.fromJson(json['student']);
+    for (var item in json['supervisor']) {
+      supervisor!.add(Faculty.fromJson(item['faculty']));
+    }
+    for (var item in json['defense_approval']) {
+      defenseApproval!.add(DefenseApproval.fromJson(item));
+    }
   }
 
   String getResearchName(int type) {
@@ -155,8 +174,37 @@ class Research {
     return code;
   }
 
+  bool isSupervisor(int facultyId) {
+    for (Faculty faculty in supervisor!) {
+      if (faculty.id == facultyId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  int? getSupervisorScore(int facultyId) {
+    for (SPV item in spv!) {
+      if (item.supervisorId == facultyId) {
+        if (item.supervisorScore?.first.mark != -1) {
+          return item.supervisorScore?.first.mark;
+        }
+      }
+    }
+    return null;
+  }
+
+  SPV? getSPV(int facultyId) {
+    for (SPV item in spv!) {
+      if (item.supervisorId == facultyId) {
+        return item;
+      }
+    }
+    return null;
+  }
+
   void updateInformation() {
-    information.value = milestone!.description ?? "";
+    information.value = milestone?.description ?? "";
     if (milestone?.sequence == 4) {
       // Proposal sudah approved di arsys
       if (siasPro) {
@@ -332,6 +380,7 @@ enum SubmissionType {
   defenseReport,
   finalDefense
 }
+
 enum EventType { none, preDefense, finalDefense, schedule }
 
 

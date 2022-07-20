@@ -1,15 +1,20 @@
 import 'package:arsys/authentication/authentication_manager.dart';
-import 'package:arsys/faculty/controllers/faculty_controller.dart';
+import 'package:arsys/controllers/user_controller.dart';
 import 'package:arsys/faculty/controllers/supervision_controller.dart';
+import 'package:arsys/faculty/views/all_event.dart';
+import 'package:arsys/faculty/views/event.dart';
+import 'package:arsys/faculty/views/event_defense_seminar.dart';
+import 'package:arsys/faculty/views/event_defense.dart';
+import 'package:arsys/faculty/views/event_supervised_student.dart';
 import 'package:arsys/faculty/views/home.dart';
 import 'package:arsys/faculty/views/profile.dart';
 import 'package:arsys/faculty/views/supervision.dart';
+import 'package:arsys/faculty/views/supervision_detail.dart';
 
 import 'package:arsys/login/view/login_view.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/firebase/fcm_controller.dart';
 import 'package:arsys/student/controllers/lecture_controller.dart';
-import 'package:arsys/student/controllers/student_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
 import 'package:arsys/student/views/all_lecture.dart';
 import 'package:arsys/student/views/event.dart';
@@ -60,9 +65,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fcmC = Get.put(FCMController());
+    final profileC = Get.put(UserController());
     final eventC = Get.put(EventController());
-    final studentProfileC = Get.put(StudentController());
-    final facultyProfileC = Get.put(FacultyController());
+    // final studentProfileC = Get.put(StudentController());
+    // final facultyProfileC = Get.put(FacultyController());
     final researchC = Get.put(ResearchController());
     final supervisionC = Get.put(SupervisionController());
     final lectureC = Get.put(LectureController());
@@ -134,6 +140,36 @@ class MyApp extends StatelessWidget {
         GetPage(
             name: '/faculty-supervision',
             page: () => FacultySupervision(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/faculty-supervision-detail',
+            page: () => SupervisionResearchDetail(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/faculty-event',
+            page: () => FacultyEvent(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/faculty-event-defense',
+            page: () => FacultyEventDefense(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/faculty-event-seminar',
+            page: () => FacultyEventSeminar(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/faculty-event-supervised',
+            page: () => FacultyEventSupervisedStudent(),
+            transition: Transition.noTransition,
+            transitionDuration: Duration.zero),
+        GetPage(
+            name: '/faculty-all-event',
+            page: () => FacultyAllEvent(),
             transition: Transition.noTransition,
             transitionDuration: Duration.zero),
         GetPage(name: '/login', page: () => LoginView()),

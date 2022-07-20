@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:arsys/faculty/controllers/faculty_controller.dart';
+import 'package:arsys/controllers/user_controller.dart';
 import 'package:arsys/firebase/fcm_controller.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
-import 'package:arsys/student/controllers/student_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:arsys/network/network.dart';
@@ -22,7 +21,7 @@ class _FacultyHomeState extends State<FacultyHome> {
   final fcmC = Get.find<FCMController>();
   final researchC = Get.find<ResearchController>();
   final eventC = Get.find<EventController>();
-  final profileC = Get.find<FacultyController>();
+  final profileC = Get.find<UserController>();
   @override
   void initState() {
     researchC.researchListUser();
@@ -42,7 +41,7 @@ class _FacultyHomeState extends State<FacultyHome> {
         Get.toNamed('/faculty-supervision');
       }
       if (_selectedNavbar == 2) {
-        Get.toNamed('/student-event');
+        Get.toNamed('/faculty-event');
       }
       if (_selectedNavbar == 3) {
         Get.toNamed('/student-lecture');

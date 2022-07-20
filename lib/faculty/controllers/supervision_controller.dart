@@ -11,7 +11,7 @@ import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SupervisionController extends GetxController {
-  var research;
+  late Research research;
   var researches = List<Research>.empty().obs;
 
   Future researchUser() async {
@@ -101,7 +101,7 @@ class SupervisionController extends GetxController {
         var item = body['research'];
         // if (items.length != 0) {
         //   for (var item in items) {
-        research = Research.fromJson(item[0]);
+        research = Research.supervisionFromJson(item[0]);
         // }
         // }
         print(research);
@@ -250,6 +250,44 @@ class SupervisionController extends GetxController {
     return false;
   }
 
+  Future approveDefense(Research res, id) async {
+    if (res.id != null &&
+        res.defenseApproval
+                ?.singleWhere((element) => element.id == id)
+                .decision ==
+            false) {
+      var response;
+      response = await Network().approveDefense(id);
+      // print(response.bodyString);
+
+      var body;
+
+      try {
+        body = await json.decode(response.bodyString);
+      } catch (e) {
+        print(e);
+        return false;
+      }
+
+      try {
+        if (response.statusCode == HttpStatus.ok) {
+          res.defenseApproval
+              ?.singleWhere((element) => element.id == id)
+              .decision = true;
+          print(res);
+        }
+        return (res.defenseApproval
+            ?.singleWhere((element) => element.id == id)
+            .decision);
+      } catch (e) {
+        print(e);
+      }
+    }
+    return (res.defenseApproval
+        ?.singleWhere((element) => element.id == id)
+        .decision);
+  }
+
   Icon iconBuilder(
       int research_type, double size, int index, String milestone) {
     Color color = Colors.white;
@@ -317,11 +355,11 @@ class SupervisionController extends GetxController {
       return Icon(Icons.block_rounded, size: 24, color: Color(0xFFFC5C65));
   }
 
-  Icon approvalIcon(var decision) {
+  Icon approvalIcon(var decision, {double size = 30}) {
     if (decision) {
-      return Icon(Icons.check_circle, size: 30, color: Colors.greenAccent);
+      return Icon(Icons.check_circle, size: size, color: Colors.greenAccent);
     } else
-      return Icon(Icons.block, size: 30, color: Colors.redAccent);
+      return Icon(Icons.block, size: size, color: Colors.redAccent);
   }
 
   Color timelineColor(bool decision) {

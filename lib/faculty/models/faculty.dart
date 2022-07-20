@@ -1,5 +1,7 @@
-class Faculty {
-  int? id;
+import 'package:arsys/models/role.dart';
+import 'package:arsys/models/user.dart';
+
+class Faculty extends User {
   String? firstName;
   String? lastName;
   String? frontTitle;
@@ -14,7 +16,7 @@ class Faculty {
   String? email;
 
   Faculty({
-    this.id,
+    id,
     this.firstName,
     this.lastName,
     this.frontTitle,
@@ -29,7 +31,8 @@ class Faculty {
   });
 
   Faculty.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    userRole = Role.faculty.value;
+    id = json['id'] ?? -1;
     firstName = json['first_name'] ?? "";
     lastName = json['last_name'] ?? "";
     frontTitle = json['front_title'] ?? "";
@@ -44,7 +47,8 @@ class Faculty {
   }
 
   Faculty.codeOnlyFromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    userRole = Role.faculty.value;
+    id = json['id'] ?? -1;
     code = json['code'] ?? "";
   }
 
@@ -57,6 +61,16 @@ class Faculty {
       fullName = '$fullName, $rearTitle';
     }
     return fullName;
+  }
+
+  @override
+  String getProfileName() {
+    return getFullNameAndTitle();
+  }
+
+  @override
+  String getRoleName() {
+    return role.toUpperCase();
   }
 }
 

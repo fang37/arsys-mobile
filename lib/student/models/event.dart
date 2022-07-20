@@ -1,4 +1,17 @@
+import 'package:arsys/student/models/room.dart';
 import 'package:intl/intl.dart';
+
+enum Type {
+  preDefense(1, 'PRE'),
+  finalDefense(2, 'PUB'),
+  eeSeminar(3, 'STE'),
+  industrialPractic(4, 'PRA'),
+  proposal(5, 'PRO');
+
+  const Type(this.id, this.abbrev);
+  final int id;
+  final String abbrev;
+}
 
 class Event {
   int? id;
@@ -13,6 +26,8 @@ class Event {
   int? current;
   String? creator;
   int? status;
+
+  List<Room>? room = <Room>[];
 
   Event({
     this.id,
@@ -42,6 +57,11 @@ class Event {
     current = json['current'] ?? -1;
     creator = json['creator'] ?? "";
     status = json['status'] ?? -1;
+    if (json['room'] != null) {
+      for (var item in json['room']) {
+        room?.add(Room.fromJson(item));
+      }
+    }
   }
 
   String getEventName(type) {

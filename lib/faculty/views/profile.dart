@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:arsys/authentication/authentication_manager.dart';
-import 'package:arsys/faculty/controllers/faculty_controller.dart';
-import 'package:arsys/student/controllers/student_controller.dart';
+import 'package:arsys/controllers/user_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,7 @@ class FacultyProfile extends StatefulWidget {
 }
 
 class _FacultyProfileState extends State<FacultyProfile> {
-  final profileC = Get.find<FacultyController>();
+  final profileC = Get.find<UserController>();
   AuthenticationManager _authManager = Get.find();
 
   @override
@@ -35,11 +34,14 @@ class _FacultyProfileState extends State<FacultyProfile> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 0) {
-        Get.toNamed('/student-home');
+        Get.toNamed('/faculty-home');
       }
       // if (_selectedNavbar == 1) () => Get.back();
+      if (_selectedNavbar == 1) {
+        Get.toNamed('/faculty-supervision');
+      }
       if (_selectedNavbar == 2) {
-        Get.toNamed('/student-event');
+        Get.toNamed('/faculty-event');
       }
       if (_selectedNavbar == 3) {
         Get.toNamed('/student-lecture');
@@ -184,8 +186,8 @@ class _FacultyProfileState extends State<FacultyProfile> {
                                                 physics:
                                                     const BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  profileC.faculty
-                                                      .getFullNameAndTitle(),
+                                                  profileC.user
+                                                      .getProfileName(),
                                                   style: const TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -226,7 +228,7 @@ class _FacultyProfileState extends State<FacultyProfile> {
                                                 physics:
                                                     const BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.faculty.nip}",
+                                                  "${profileC.user.nip}",
                                                   style: const TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -267,7 +269,7 @@ class _FacultyProfileState extends State<FacultyProfile> {
                                                 physics:
                                                     const BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  profileC.faculty.role,
+                                                  profileC.user.getRoleName(),
                                                   style: const TextStyle(
                                                       color: const Color(
                                                           0xff3A4856),
@@ -309,7 +311,7 @@ class _FacultyProfileState extends State<FacultyProfile> {
                                                 physics:
                                                     const BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.faculty.specialization}",
+                                                  "${profileC.user.specialization}",
                                                   style: const TextStyle(
                                                       color: const Color(
                                                           0xff3A4856),
@@ -351,7 +353,7 @@ class _FacultyProfileState extends State<FacultyProfile> {
                                                 physics:
                                                     const BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.faculty.email}",
+                                                  "${profileC.user.email}",
                                                   style: const TextStyle(
                                                       color: Color(0xff3A4856),
                                                       fontSize: 20,
@@ -392,7 +394,7 @@ class _FacultyProfileState extends State<FacultyProfile> {
                                                 physics:
                                                     const BouncingScrollPhysics(),
                                                 child: SelectableText(
-                                                  "${profileC.faculty.phone}",
+                                                  "${profileC.user.phone}",
                                                   style: const TextStyle(
                                                       color: const Color(
                                                           0xff3A4856),
@@ -438,7 +440,7 @@ class _FacultyProfileState extends State<FacultyProfile> {
                                             return Column(
                                               children: [
                                                 Text(
-                                                  profileC.faculty.code ?? "",
+                                                  profileC.user.code ?? "",
                                                   style: const TextStyle(
                                                       height: 0.97,
                                                       fontSize: 30,

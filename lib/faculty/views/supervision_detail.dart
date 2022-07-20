@@ -5,8 +5,14 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:arsys/controllers/user_controller.dart';
+import 'package:arsys/faculty/controllers/supervision_controller.dart';
+import 'package:arsys/faculty/models/faculty.dart';
+import 'package:arsys/faculty/views/profile.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
+import 'package:arsys/student/models/defense_approval.dart';
+import 'package:arsys/student/models/event_applicant.dart';
 import 'package:arsys/student/models/research.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/gestures.dart';
@@ -19,15 +25,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
-class StudentResearchEvent extends StatefulWidget {
+class SupervisionResearchDetail extends StatefulWidget {
   @override
-  _StudentResearchEventState createState() => _StudentResearchEventState();
+  _SupervisionResearchDetailState createState() =>
+      _SupervisionResearchDetailState();
 }
 
-class _StudentResearchEventState extends State<StudentResearchEvent> {
-  final researchC = Get.find<ResearchController>();
+class _SupervisionResearchDetailState extends State<SupervisionResearchDetail> {
+  final researchC = Get.find<SupervisionController>();
   final eventC = Get.find<EventController>();
-  final int researchId = Get.arguments;
+  final profileC = Get.find<UserController>();
+  final researchId = Get.arguments;
   var research;
   ScrollController scrollC = new ScrollController();
   @override
@@ -40,11 +48,11 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 0) {
-        Get.toNamed('/student-home');
+        Get.toNamed('/faculty-home');
       }
       // if (_selectedNavbar == 1) () => Get.back();
       if (_selectedNavbar == 2) {
-        Get.toNamed('/student-event');
+        Get.toNamed('/faculty-event');
       }
       if (_selectedNavbar == 3) {
         Get.toNamed('/student-lecture');
@@ -56,7 +64,7 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F9FE),
-      appBar: SecondAppBarBuilder("Research Events"),
+      appBar: SecondAppBarBuilder("Supervision"),
       body: Platform.isIOS
           ? Container()
           : SafeArea(
@@ -72,15 +80,541 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
                           );
                         } else {
                           research = researchC.research;
-                          if (research.getEventType() == EventType.preDefense ||
-                              research.getEventType() ==
-                                  EventType.finalDefense) {
-                            return eventApply(context);
-                          } else if (research.getEventType() ==
-                              EventType.schedule) {
-                            return eventApplicant(context);
-                          } else
-                            return Container();
+                          return Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      RichText(
+                                        text: TextSpan(
+                                            text:
+                                                research.student?.getFullName(),
+                                            style: const TextStyle(
+                                                fontSize: 24,
+                                                fontFamily: 'OpenSans',
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xff3A4856)),
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                titleModal(context);
+                                              }),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                            text: "${research.researchCode}",
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'OpenSans',
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.lightBlueAccent),
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                abstractModal(context);
+                                              }),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: Card(
+                                        margin:
+                                            EdgeInsets.only(left: 5, right: 5),
+                                        elevation: 2.0,
+                                        color: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: ClipPath(
+                                          clipper: ShapeBorderClipper(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0))),
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
+                                              child: Expanded(
+                                                child: Scrollbar(
+                                                  child: ListView(
+                                                    physics:
+                                                        BouncingScrollPhysics(),
+                                                    // crossAxisAlignment:
+                                                    //     CrossAxisAlignment.center,
+                                                    // mainAxisAlignment:
+                                                    //     MainAxisAlignment.start,
+                                                    // mainAxisSize:
+                                                    //     MainAxisSize.min,
+                                                    children: [
+                                                      const Center(
+                                                        child: Text(
+                                                            "Research Data",
+                                                            style: TextStyle(
+                                                                fontSize: 18,
+                                                                fontFamily:
+                                                                    'OpenSans',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: Color(
+                                                                    0xff3A4856))),
+                                                      ),
+                                                      const Divider(
+                                                        thickness: 1,
+                                                        indent: 10,
+                                                        endIndent: 10,
+                                                      ),
+                                                      const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                bottom: 10.0),
+                                                        child: Center(
+                                                          child: Text(
+                                                            "Supervisor",
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Helvetica',
+                                                                color: Colors
+                                                                    .black54),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  13, 0, 13, 0),
+                                                          child:
+                                                              ListView.builder(
+                                                                  shrinkWrap:
+                                                                      true,
+                                                                  physics:
+                                                                      const NeverScrollableScrollPhysics(),
+                                                                  itemCount: research
+                                                                      .supervisor
+                                                                      .length,
+                                                                  itemBuilder:
+                                                                      (context,
+                                                                          index) {
+                                                                    return Container(
+                                                                        margin: const EdgeInsets.only(
+                                                                            bottom:
+                                                                                5),
+                                                                        padding:
+                                                                            const EdgeInsets.all(
+                                                                                8),
+                                                                        decoration: BoxDecoration(
+                                                                            color: Colors.blueGrey[
+                                                                                50],
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                10.0)),
+                                                                        child: Text(
+                                                                            "${research.supervisor[index].getFullNameAndTitle()}",
+                                                                            style: const TextStyle(
+                                                                                fontSize: 16,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontFamily: 'Helvetica',
+                                                                                color: Color(0xff3A4856))));
+                                                                  }),
+                                                        ),
+                                                      ),
+                                                      const Divider(
+                                                        thickness: 1,
+                                                        indent: 10,
+                                                        endIndent: 10,
+                                                      ),
+                                                      SizedBox(
+                                                        width: double.infinity,
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              const Text(
+                                                                  "Approval",
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'Helvetica',
+                                                                      color: Colors
+                                                                          .black54)),
+                                                              (research.defenseApproval ==
+                                                                      null)
+                                                                  ? const Text(
+                                                                      "No approval",
+                                                                      style: TextStyle(
+                                                                          fontFamily:
+                                                                              'Helvetica',
+                                                                          color:
+                                                                              Colors.black87))
+                                                                  : Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              8.0),
+                                                                      child: SizedBox(
+                                                                          width: double.infinity,
+                                                                          child: ListView.builder(
+                                                                              shrinkWrap: true,
+                                                                              physics: const NeverScrollableScrollPhysics(),
+                                                                              itemCount: research.defenseApproval.length,
+                                                                              itemBuilder: (context, index) {
+                                                                                return Container(
+                                                                                  margin: EdgeInsets.only(bottom: 5),
+                                                                                  child: IntrinsicHeight(
+                                                                                    child: Row(
+                                                                                      children: [
+                                                                                        Text("${research.defenseApproval[index].defenseModel.description}", style: TextStyle(fontSize: 16, fontFamily: "OpenSans")),
+                                                                                        const VerticalDivider(
+                                                                                          thickness: 2,
+                                                                                          indent: 2,
+                                                                                          endIndent: 2,
+                                                                                        ),
+                                                                                        Text(
+                                                                                          "${research.defenseApproval[index].approver.code}",
+                                                                                          style: TextStyle(fontSize: 16, fontFamily: "OpenSans"),
+                                                                                        ),
+                                                                                        const VerticalDivider(
+                                                                                          thickness: 2,
+                                                                                          indent: 2,
+                                                                                          endIndent: 2,
+                                                                                        ),
+                                                                                        researchC.approvalIcon(research.defenseApproval[index].decision, size: 16),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                );
+                                                                              })),
+                                                                    ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        width: double.infinity,
+                                                        child: ListView.builder(
+                                                            physics:
+                                                                const NeverScrollableScrollPhysics(),
+                                                            shrinkWrap: true,
+                                                            itemCount: research
+                                                                .defenseApproval
+                                                                .where((approval) =>
+                                                                    approval.decision ==
+                                                                        false &&
+                                                                    approval.approverId ==
+                                                                        profileC
+                                                                            .user
+                                                                            .id)
+                                                                .length,
+                                                            itemBuilder:
+                                                                (context, i) {
+                                                              var approval = research
+                                                                  .defenseApproval
+                                                                  .where((element) =>
+                                                                      element.decision ==
+                                                                          false &&
+                                                                      element.approverId ==
+                                                                          profileC
+                                                                              .user
+                                                                              .id)
+                                                                  .elementAt(i);
+                                                              return Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        10,
+                                                                        10,
+                                                                        10,
+                                                                        0),
+                                                                child: SizedBox(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  child:
+                                                                      ElevatedButton(
+                                                                    style: ElevatedButton.styleFrom(
+                                                                        primary: Colors
+                                                                            .lightBlueAccent
+                                                                            .shade700,
+                                                                        elevation:
+                                                                            0,
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(15))),
+                                                                    child: Text(
+                                                                      "Approve ${approval.defenseModel?.description}",
+                                                                      style: const TextStyle(
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontFamily:
+                                                                              'Helvetica',
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Get.defaultDialog(
+                                                                          contentPadding: EdgeInsets.all(15),
+                                                                          title: 'Confirmation',
+                                                                          titleStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xff3A4856)),
+                                                                          titlePadding: EdgeInsets.only(top: 15),
+                                                                          content: Text(
+                                                                            "Approve this ${approval.defenseModel?.description}",
+                                                                            style:
+                                                                                TextStyle(color: Color(0xff3A4856)),
+                                                                          ),
+                                                                          textCancel: 'Cancel',
+                                                                          textConfirm: 'Yes',
+                                                                          confirmTextColor: Colors.white,
+                                                                          radius: 15,
+                                                                          onConfirm: () {
+                                                                            researchC.approveDefense(research,
+                                                                                approval.id);
+                                                                            refreshResearch();
+
+                                                                            Get.back();
+                                                                          });
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }),
+                                                      ),
+                                                      SizedBox(
+                                                        width: double.infinity,
+                                                        child: FutureBuilder<
+                                                                dynamic>(
+                                                            future: eventC
+                                                                .getEventApplicantByResearch(
+                                                                    research
+                                                                        .id),
+                                                            builder: (context,
+                                                                snapshot) {
+                                                              if (snapshot
+                                                                      .connectionState ==
+                                                                  ConnectionState
+                                                                      .waiting) {
+                                                                return const Center(
+                                                                  child:
+                                                                      CircularProgressIndicator(),
+                                                                );
+                                                              } else if (!snapshot
+                                                                  .hasData) {
+                                                                return const Expanded(
+                                                                    child: Center(
+                                                                        child: Text(
+                                                                            'No Event')));
+                                                              } else {
+                                                                return SizedBox(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  child: Column(
+                                                                    children: [
+                                                                      const Divider(
+                                                                          thickness:
+                                                                              1,
+                                                                          indent:
+                                                                              10,
+                                                                          endIndent:
+                                                                              10),
+                                                                      Padding(
+                                                                        padding:
+                                                                            const EdgeInsets.symmetric(horizontal: 10),
+                                                                        child:
+                                                                            Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.center,
+                                                                          children: [
+                                                                            const Text("Applied Event",
+                                                                                style: TextStyle(fontFamily: 'Helvetica', color: Colors.black54)),
+                                                                            Padding(
+                                                                              padding: EdgeInsets.all(8.0),
+                                                                              child: ListView.builder(
+                                                                                  shrinkWrap: true,
+                                                                                  physics: const NeverScrollableScrollPhysics(),
+                                                                                  itemCount: snapshot.data.length,
+                                                                                  itemBuilder: (context, index) {
+                                                                                    return Container(
+                                                                                        margin: EdgeInsets.only(bottom: 10),
+                                                                                        child: Column(
+                                                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                          children: [
+                                                                                            Container(
+                                                                                                margin: EdgeInsets.only(bottom: 5),
+                                                                                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                                                                                decoration: BoxDecoration(
+                                                                                                  borderRadius: BorderRadius.circular(10.0),
+                                                                                                  color: Colors.blueGrey[50],
+                                                                                                ),
+                                                                                                child: Text("${snapshot.data[index].event.eventName}",
+                                                                                                    style: const TextStyle(
+                                                                                                      fontSize: 16,
+                                                                                                      fontWeight: FontWeight.w600,
+                                                                                                      fontFamily: 'Helvetica',
+                                                                                                      color: Color(0xff3A4856),
+                                                                                                    ))),
+                                                                                            Container(
+                                                                                                margin: EdgeInsets.only(bottom: 5),
+                                                                                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                                                                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0)),
+                                                                                                child: Wrap(
+                                                                                                  direction: Axis.horizontal,
+                                                                                                  crossAxisAlignment: WrapCrossAlignment.end,
+                                                                                                  spacing: 8,
+                                                                                                  children: [
+                                                                                                    const Icon(
+                                                                                                      Icons.date_range_rounded,
+                                                                                                      color: Colors.redAccent,
+                                                                                                    ),
+                                                                                                    Text(
+                                                                                                      "${snapshot.data[index].session.time}, ${snapshot.data[index].event.getDateInFormat(date: snapshot.data[index].event.eventDate, format: "dd MMM yyyy")}",
+                                                                                                      style: const TextStyle(
+                                                                                                        fontSize: 16,
+                                                                                                        fontFamily: 'Helvetica',
+                                                                                                        color: Color(0xff3A4856),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                  ],
+                                                                                                )),
+                                                                                            Container(
+                                                                                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                                                                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0)),
+                                                                                                child: Wrap(
+                                                                                                  direction: Axis.horizontal,
+                                                                                                  crossAxisAlignment: WrapCrossAlignment.end,
+                                                                                                  alignment: WrapAlignment.start,
+                                                                                                  runAlignment: WrapAlignment.start,
+                                                                                                  spacing: 8,
+                                                                                                  children: [
+                                                                                                    const Icon(
+                                                                                                      Icons.person_search_rounded,
+                                                                                                      color: Colors.lightBlueAccent,
+                                                                                                    ),
+                                                                                                    const Text(
+                                                                                                      "Examiner",
+                                                                                                      style: TextStyle(
+                                                                                                        fontSize: 16,
+                                                                                                        fontFamily: 'OpenSans',
+                                                                                                        fontWeight: FontWeight.bold,
+                                                                                                        color: Colors.lightBlueAccent,
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    Text(
+                                                                                                      "${snapshot.data[index].getExaminerCode()}",
+                                                                                                      style: const TextStyle(
+                                                                                                        fontSize: 16,
+                                                                                                        fontFamily: 'Helvetica',
+                                                                                                        color: Color(0xff3A4856),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                  ],
+                                                                                                )),
+                                                                                          ],
+                                                                                        ));
+                                                                                  }),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              }
+                                                              ;
+                                                            }),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Expanded(
+                                //   child: GridView.count(
+                                //       // primary: true,
+                                //       padding: const EdgeInsets.symmetric(
+                                //           horizontal: 10),
+                                //       crossAxisSpacing: 10,
+                                //       mainAxisSpacing: 10,
+                                //       crossAxisCount: 2,
+                                //       shrinkWrap: true,
+                                //       physics: BouncingScrollPhysics(),
+                                //       children: <Widget>[
+                                //         InkWell(
+                                //           onTap: () => approvalModal(context),
+                                //           child: menuCard(
+                                //               "Approval", Icons.check_rounded),
+                                //         ),
+                                //         InkWell(
+                                //           onTap: () {
+                                //             if (research.getSubmissionType() ==
+                                //                 SubmissionType.none) {
+                                //               return null;
+                                //             } else if (research
+                                //                     .getSubmissionType() ==
+                                //                 SubmissionType.defenseReport) {
+                                //               _navigateAndRefresh(
+                                //                   '/student-research-event-report');
+                                //             } else {
+                                //               submissionModal(context);
+                                //             }
+                                //           },
+                                //           child: menuCard(
+                                //               "Submission", Icons.send_rounded,
+                                //               isActive: research
+                                //                       .getSubmissionType() !=
+                                //                   SubmissionType.none),
+                                //         ),
+                                //         InkWell(
+                                //           onTap: () =>
+                                //               proposalReviewModal(context),
+                                //           child: menuCard("Proposal Review",
+                                //               Icons.feedback_rounded),
+                                //         ),
+                                //         InkWell(
+                                //           onTap: () {
+                                //             if (research.getEventType() !=
+                                //                 EventType.none) {
+                                //               _navigateAndRefresh(
+                                //                   '/student-research-event');
+                                //             }
+                                //             null;
+                                //           },
+                                //           child: menuCard("Event",
+                                //               Icons.calendar_month_rounded,
+                                //               isActive:
+                                //                   research.getEventType() !=
+                                //                       EventType.none),
+                                //         ),
+                                //       ]),
+                                // ),
+                              ]);
                         }
                       }))),
       bottomNavigationBar: ConvexAppBar(
@@ -99,892 +633,6 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
         ],
         initialActiveIndex: _selectedNavbar,
         onTap: _changeSelectedNavBar,
-      ),
-    );
-  }
-
-  Column eventApply(BuildContext context) {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                        text: research.title,
-                        style: const TextStyle(
-                            fontSize: 24,
-                            fontFamily: 'OpenSans',
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff3A4856)),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            titleModal(context);
-                          }),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: informationCard(context),
-          ),
-          Expanded(
-              flex: 6,
-              child: FutureBuilder<dynamic>(
-                  future: eventC.getApplicableEvent(researchId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (!snapshot.hasData) {
-                      return Expanded(
-                          child: Center(child: Text('No Upcoming Event')));
-                    } else {
-                      return ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          itemCount: snapshot.data.length,
-                          itemBuilder: (context, index) {
-                            return Expanded(
-                                child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Card(
-                                margin: EdgeInsets.only(left: 5, right: 5),
-                                elevation: 2.0,
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: ClipPath(
-                                  clipper: ShapeBorderClipper(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0))),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      splashColor: Colors.lightBlue[100],
-                                      onTap: () {},
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                    "${snapshot.data[index].eventName}",
-                                                    style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontFamily: 'OpenSans',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xff3A4856))),
-                                                Text(
-                                                    "${snapshot.data[index].eventId}",
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontFamily: 'OpenSans',
-                                                        color:
-                                                            Color(0xff3A4856))),
-                                              ],
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Text(
-                                                          "Event Date",
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'Helvetica',
-                                                              color: Colors
-                                                                  .black54),
-                                                        ),
-                                                        Container(
-                                                            margin: EdgeInsets
-                                                                .only(top: 8),
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            decoration: BoxDecoration(
-                                                                color: Colors
-                                                                        .blueGrey[
-                                                                    50],
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15.0)),
-                                                            child: Text(
-                                                                " ${snapshot.data[index].getDateInFormat(date: snapshot.data[index].eventDate)}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontFamily:
-                                                                        'Helvetica',
-                                                                    color: Color(
-                                                                        0xff3A4856)))),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 5),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        const Text(
-                                                          "Seats Left",
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'Helvetica',
-                                                              color: Colors
-                                                                  .black54),
-                                                        ),
-                                                        Container(
-                                                            margin: EdgeInsets
-                                                                .only(top: 8),
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            decoration: BoxDecoration(
-                                                                color: Colors
-                                                                        .blueGrey[
-                                                                    50],
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15.0)),
-                                                            child: Text(
-                                                                " ${snapshot.data[index].getSeats()}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontFamily:
-                                                                        'Helvetica',
-                                                                    color: Color(
-                                                                        0xff3A4856)))),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Text(
-                                                          "Deadline",
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'Helvetica',
-                                                              color: Colors
-                                                                  .black54),
-                                                        ),
-                                                        Container(
-                                                            margin: EdgeInsets
-                                                                .only(top: 8),
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            decoration: BoxDecoration(
-                                                                color: Colors
-                                                                        .blueGrey[
-                                                                    50],
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15.0)),
-                                                            child: Text(
-                                                                "${snapshot.data[index].getDateInFormat(date: snapshot.data[index].applicationDeadline)}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontFamily:
-                                                                        'Helvetica',
-                                                                    color: Color(
-                                                                        0xff3A4856)))),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      10, 10, 10, 0),
-                                              child: SizedBox(
-                                                width: double.infinity,
-                                                child: ElevatedButton(
-                                                  style: ElevatedButton.styleFrom(
-                                                      primary: Colors
-                                                          .lightBlueAccent
-                                                          .shade700,
-                                                      elevation: 0,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15))),
-                                                  child: const Text(
-                                                    "Apply",
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontFamily: 'Helvetica',
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  onPressed: () {
-                                                    if (research
-                                                            .getEventType() ==
-                                                        EventType.none) {
-                                                      return;
-                                                    } else {
-                                                      Get.defaultDialog(
-                                                          contentPadding:
-                                                              const EdgeInsets
-                                                                  .all(15),
-                                                          title: 'Confirmation',
-                                                          titleStyle:
-                                                              const TextStyle(
-                                                                  fontSize: 24,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Color(
-                                                                      0xff3A4856)),
-                                                          titlePadding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  top: 15),
-                                                          content: const Text(
-                                                            "You can't cancel the event after apply this event",
-                                                            style: TextStyle(
-                                                                color: Color(
-                                                                    0xff3A4856)),
-                                                          ),
-                                                          textCancel: 'Cancel',
-                                                          textConfirm: 'Yes',
-                                                          confirmTextColor:
-                                                              Colors.white,
-                                                          radius: 15,
-                                                          onConfirm: () async {
-                                                            var response = await eventC
-                                                                .applyEvent(
-                                                                    research,
-                                                                    snapshot
-                                                                        .data[
-                                                                            index]
-                                                                        .id);
-                                                            if (response) {
-                                                              research
-                                                                  .updateInformation();
-                                                              Get.back();
-                                                              Get.back(
-                                                                  result: ({
-                                                                'title':
-                                                                    'Event Applied',
-                                                                'message':
-                                                                    'The event has been applied successfully'
-                                                              }));
-                                                            } else {
-                                                              Get.back();
-                                                              Get.back(
-                                                                  result: ({
-                                                                'title':
-                                                                    'Event not applied',
-                                                                'message':
-                                                                    'Failed to apply event'
-                                                              }));
-                                                            }
-                                                          });
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ));
-                          });
-                    }
-                    ;
-                  })),
-          // Expanded(
-          //   flex: 4,
-          //   child: Container(
-          //     color: Colors.pink,
-          //     child: Padding(
-          //       padding: EdgeInsets.all(8.0),
-          //       child: Text(
-          //         'Progress of Supervision',
-          //         style: TextStyle(
-          //             color: Color(0xff3A4856),
-          //             fontSize: 16,
-          //             fontFamily: 'OpenSans',
-          //             fontWeight: FontWeight.bold),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          // superviseBuilder(research: research, researchC: researchC),
-          // Expanded(
-          //     flex: 2, child: Container(color: Colors.lightBlue))
-          // BUAT SCROLLABLE APP NYA
-        ]);
-  }
-
-  Column eventApplicant(BuildContext context) {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
-                      text: "Applied Event",
-                      style: const TextStyle(
-                          fontSize: 24,
-                          fontFamily: 'OpenSans',
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff3A4856)),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          titleModal(context);
-                        }),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          // Expanded(
-          //   flex: 2,
-          //   child: informationCard(context),
-          // ),
-          Expanded(
-              child: FutureBuilder<dynamic>(
-                  future: eventC.getEventApplicantByResearch(researchId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (!snapshot.hasData) {
-                      return Expanded(
-                          child: Center(child: Text('No Upcoming Event')));
-                    } else {
-                      return ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          itemCount: snapshot.data.length,
-                          itemBuilder: (context, index) {
-                            return Expanded(
-                                child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Card(
-                                margin: EdgeInsets.only(left: 5, right: 5),
-                                elevation: 2.0,
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: ClipPath(
-                                  clipper: ShapeBorderClipper(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0))),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      splashColor: Colors.lightBlue[100],
-                                      onTap: () {},
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                    "${snapshot.data[index].event.eventName}",
-                                                    style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontFamily: 'OpenSans',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xff3A4856))),
-                                                Text(
-                                                    "${snapshot.data[index].event.getDateInFormat(date: snapshot.data[index].event.eventDate, format: "dd MMM yyyy")}",
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontFamily: 'OpenSans',
-                                                        color:
-                                                            Color(0xff3A4856))),
-                                              ],
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Text(
-                                                          "Supervisor",
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'Helvetica',
-                                                              color: Colors
-                                                                  .black54),
-                                                        ),
-                                                        Container(
-                                                            margin: EdgeInsets
-                                                                .only(top: 8),
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            decoration: BoxDecoration(
-                                                                color: Colors
-                                                                        .blueGrey[
-                                                                    50],
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15.0)),
-                                                            child: Text(
-                                                                " ${research.getSupervisorCode()}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontFamily:
-                                                                        'Helvetica',
-                                                                    color: Color(
-                                                                        0xff3A4856)))),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 5),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        const Text(
-                                                          "Examiner",
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'Helvetica',
-                                                              color: Colors
-                                                                  .black54),
-                                                        ),
-                                                        Container(
-                                                            margin: EdgeInsets
-                                                                .only(top: 8),
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            decoration: BoxDecoration(
-                                                                color: Colors
-                                                                        .blueGrey[
-                                                                    50],
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15.0)),
-                                                            child: Text(
-                                                                " ${snapshot.data[index].getExaminerCode()}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontFamily:
-                                                                        'Helvetica',
-                                                                    color: Color(
-                                                                        0xff3A4856)))),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const Divider(
-                                              thickness: 1,
-                                              indent: 10,
-                                              endIndent: 10,
-                                            ),
-                                            SizedBox(
-                                              width: double.infinity,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    const Text("Schedule",
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'Helvetica',
-                                                            color: Colors
-                                                                .black54)),
-                                                    snapshot
-                                                                .data[index]
-                                                                .getExaminerCode() ==
-                                                            "-"
-                                                        ? Text(
-                                                            "Your event is not scheduled yet.",
-                                                            style: TextStyle(
-                                                                fontFamily:
-                                                                    'Helvetica',
-                                                                color: Colors
-                                                                    .black87))
-                                                        : SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                            top:
-                                                                                8),
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .all(
-                                                                                8),
-                                                                    decoration: BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(15.0)),
-                                                                    child: Wrap(
-                                                                      direction:
-                                                                          Axis.horizontal,
-                                                                      crossAxisAlignment:
-                                                                          WrapCrossAlignment
-                                                                              .center,
-                                                                      spacing:
-                                                                          8,
-                                                                      children: [
-                                                                        Icon(
-                                                                          Icons
-                                                                              .date_range_rounded,
-                                                                          color:
-                                                                              Colors.redAccent,
-                                                                        ),
-                                                                        Text(
-                                                                            "${snapshot.data[index].session.time}, ${snapshot.data[index].event.getDateInFormat(date: snapshot.data[index].event.eventDate, format: "dd MMM yyyy")}",
-                                                                            style: const TextStyle(
-                                                                                fontSize: 16,
-                                                                                fontWeight: FontWeight.w600,
-                                                                                fontFamily: 'Helvetica',
-                                                                                color: Color(0xff3A4856))),
-                                                                      ],
-                                                                    )),
-                                                                Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                            top:
-                                                                                8),
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .all(
-                                                                                8),
-                                                                    decoration: BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(15.0)),
-                                                                    child: Wrap(
-                                                                      direction:
-                                                                          Axis.horizontal,
-                                                                      crossAxisAlignment:
-                                                                          WrapCrossAlignment
-                                                                              .center,
-                                                                      runSpacing:
-                                                                          8,
-                                                                      children: [
-                                                                        Wrap(
-                                                                          direction:
-                                                                              Axis.horizontal,
-                                                                          spacing:
-                                                                              5,
-                                                                          crossAxisAlignment:
-                                                                              WrapCrossAlignment.center,
-                                                                          children: [
-                                                                            const Icon(
-                                                                              Icons.video_call_rounded,
-                                                                              color: Colors.lightBlueAccent,
-                                                                            ),
-                                                                            InkWell(
-                                                                              onTap: () {
-                                                                                Clipboard.setData(ClipboardData(text: snapshot.data[index].space.space));
-                                                                                Get.snackbar("Text copied!", "Zoom ID has been copied to your clipboard", snackPosition: SnackPosition.BOTTOM);
-                                                                              },
-                                                                              child: Text("${snapshot.data[index].space.space}", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal, fontFamily: 'Helvetica', color: Color(0xff3A4856))),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        VerticalDivider(),
-                                                                        Wrap(
-                                                                          direction:
-                                                                              Axis.horizontal,
-                                                                          crossAxisAlignment:
-                                                                              WrapCrossAlignment.center,
-                                                                          spacing:
-                                                                              5,
-                                                                          children: [
-                                                                            const Icon(
-                                                                              Icons.lock_open_rounded,
-                                                                              color: Colors.lightBlueAccent,
-                                                                            ),
-                                                                            InkWell(
-                                                                              onTap: () {
-                                                                                Clipboard.setData(new ClipboardData(text: snapshot.data[index].space.passcode));
-                                                                                Get.snackbar("Text copied!", "Meeting password has been copied to your clipboard", snackPosition: SnackPosition.BOTTOM);
-                                                                              },
-                                                                              child: Text("${snapshot.data[index].space.passcode}", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal, fontFamily: 'Helvetica', color: Color(0xff3A4856))),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        VerticalDivider(),
-                                                                        Wrap(
-                                                                          direction:
-                                                                              Axis.horizontal,
-                                                                          spacing:
-                                                                              5,
-                                                                          crossAxisAlignment:
-                                                                              WrapCrossAlignment.center,
-                                                                          children: [
-                                                                            const Icon(
-                                                                              Icons.link_rounded,
-                                                                              color: Colors.greenAccent,
-                                                                            ),
-                                                                            InkWell(
-                                                                              onTap: () {
-                                                                                Clipboard.setData(new ClipboardData(text: snapshot.data[index].space.link));
-                                                                                Get.snackbar("Text copied!", "Zoom Link has been copied to your clipboard", snackPosition: SnackPosition.BOTTOM);
-                                                                              },
-                                                                              child: const Text("Meeting Link", style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, fontFamily: 'Helvetica', color: Color(0xff3A4856))),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    )),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            (snapshot.data[index]
-                                                        .getExaminerCode() ==
-                                                    "-")
-                                                ? Container()
-                                                : Padding(
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10, 10, 10, 0),
-                                                    child: SizedBox(
-                                                      width: double.infinity,
-                                                      child: ElevatedButton(
-                                                        style: ElevatedButton.styleFrom(
-                                                            primary: Colors
-                                                                .lightBlueAccent
-                                                                .shade700,
-                                                            elevation: 0,
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15))),
-                                                        child: Text(
-                                                          "Share",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontFamily:
-                                                                  'Helvetica',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        onPressed: () {
-                                                          Clipboard.setData(
-                                                              new ClipboardData(
-                                                                  text: snapshot
-                                                                      .data[
-                                                                          index]
-                                                                      .getShareableScheduleLink()));
-                                                          Get.snackbar(
-                                                              "Text copied!",
-                                                              "Meeting details has been copied to your clipboard",
-                                                              snackPosition:
-                                                                  SnackPosition
-                                                                      .BOTTOM);
-                                                        },
-                                                      ),
-                                                    ),
-                                                  )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ));
-                          });
-                    }
-                    ;
-                  })),
-          // Expanded(
-          //   flex: 4,
-          //   child: Container(
-          //     color: Colors.pink,
-          //     child: Padding(
-          //       padding: EdgeInsets.all(8.0),
-          //       child: Text(
-          //         'Progress of Supervision',
-          //         style: TextStyle(
-          //             color: Color(0xff3A4856),
-          //             fontSize: 16,
-          //             fontFamily: 'OpenSans',
-          //             fontWeight: FontWeight.bold),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          // superviseBuilder(research: research, researchC: researchC),
-          // Expanded(
-          //     flex: 2, child: Container(color: Colors.lightBlue))
-          // BUAT SCROLLABLE APP NYA
-        ]);
-  }
-
-  Padding informationCard(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(8.0),
-      child: Flexible(
-        child: SizedBox(
-          width: double.infinity,
-          child: Card(
-            elevation: 3,
-            color: researchC.cardColorBuilder(research.milestone.milestone),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            child: ClipPath(
-              clipper: ShapeBorderClipper(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0))),
-              child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text("Information!",
-                          style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 16,
-                              fontFamily: 'OpenSans',
-                              fontWeight: FontWeight.bold)),
-                      Expanded(
-                          child: Center(
-                              child: SingleChildScrollView(
-                        child: RichText(
-                          text: TextSpan(
-                              text:
-                                  "Apply for ${research.milestone?.milestone} Event",
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'OpenSans',
-                                  color: Colors.black87),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  titleModal(context);
-                                }),
-                        ),
-                      )))
-                    ],
-                  )),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -1067,10 +715,22 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
                                                     .decision,
                                               )),
                                           axis: TimelineAxis.vertical,
-                                          beforeLineStyle: const LineStyle(
-                                              color: Colors.greenAccent),
-                                          afterLineStyle: const LineStyle(
-                                              color: Colors.greenAccent),
+                                          beforeLineStyle: LineStyle(
+                                              color: researchC.timelineColor(
+                                                  research
+                                                      .defenseApproval[index]
+                                                      .decision)),
+                                          afterLineStyle: LineStyle(
+                                              color: (index <
+                                                      research.defenseApproval
+                                                              .length -
+                                                          1)
+                                                  ? researchC.timelineColor(
+                                                      research
+                                                          .defenseApproval[
+                                                              index + 1]
+                                                          .decision)
+                                                  : Colors.transparent),
                                           isFirst: (index == 0) ? true : false,
                                           isLast: (index ==
                                                   research.defenseApproval
@@ -1223,6 +883,158 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Submission',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontFamily: 'OpenSans',
+                                fontWeight: FontWeight.bold)),
+                        IconButton(
+                          onPressed: () {
+                            if (Get.isBottomSheetOpen != null) {
+                              Get.back();
+                            }
+                          },
+                          icon: const Icon(Icons.close_rounded),
+                          color: Colors.white,
+                        )
+                      ],
+                    ),
+                    Flexible(
+                      child: (research.getSubmissionType() ==
+                              SubmissionType.none)
+                          ? Text(research.getSubmissionTitle(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontFamily: 'OpenSans',
+                              ))
+                          : Card(
+                              elevation: 4.0,
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: ClipPath(
+                                clipper: ShapeBorderClipper(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0))),
+                                child: Scrollbar(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: FutureBuilder(
+                                        builder: (context, snapshot) {
+                                      return Column(
+                                        children: [
+                                          Text(research.getSubmissionTitle(),
+                                              style: const TextStyle(
+                                                  color: Colors.black87,
+                                                  fontSize: 16,
+                                                  fontFamily: 'OpenSans',
+                                                  fontWeight: FontWeight.bold)),
+                                          Text(
+                                              research
+                                                  .getSubmissionDescription(),
+                                              style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 16,
+                                                fontFamily: 'OpenSans',
+                                              )),
+                                        ],
+                                      );
+                                    }),
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
+                    research.getSubmissionType() == SubmissionType.none
+                        ? Container()
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                primary: Colors.lightBlueAccent.shade700,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15))),
+                            child: Text(
+                              research.milestone.proposeButton
+                                  ? "Propose"
+                                  : "SUBMIT",
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Helvetica',
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: () {
+                              if (research.getSubmissionType() ==
+                                  SubmissionType.none) {
+                                return;
+                              } else if (research.getSubmissionType() ==
+                                  SubmissionType.defenseReport) {
+                                _navigateAndRefresh(
+                                    '/student-research-event-report');
+                              } else {
+                                print("THIS IS EVENT REPORT ROUTES");
+                                Get.defaultDialog(
+                                    contentPadding: EdgeInsets.all(15),
+                                    title: 'Confirmation',
+                                    titleStyle: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xff3A4856)),
+                                    titlePadding: EdgeInsets.only(top: 15),
+                                    content: Text(
+                                      research.getSubmissionDescription(),
+                                      style:
+                                          TextStyle(color: Color(0xff3A4856)),
+                                    ),
+                                    textCancel: 'Cancel',
+                                    textConfirm: 'Yes',
+                                    confirmTextColor: Colors.white,
+                                    radius: 15,
+                                    onConfirm: () {
+                                      researchC.submissionSelector(research);
+                                      research.updateInformation();
+                                      refreshResearch();
+
+                                      Get.back();
+                                      Get.back();
+                                    });
+                              }
+                            },
+                          ),
+                  ],
+                ),
+              ),
+            );
+          });
+        },
+        shape: const RoundedRectangleBorder(
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+        ),
+        clipBehavior: Clip.antiAliasWithSaveLayer);
+  }
+
+  Future<dynamic> eventScheduleModal(BuildContext context) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, StateSetter modalstate) {
+            return Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+                color: Colors.lightBlueAccent,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Event Detail',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -1404,7 +1216,6 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
                                   scrollDirection: Axis.vertical,
                                   itemCount: research.proposalReview.length,
                                   itemBuilder: (context, index) {
-                                    print(research.proposalReview.length);
                                     if (research.proposalReview.length == 0) {
                                       print('no proposal review');
                                       return const Expanded(
@@ -1507,9 +1318,10 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
         clipBehavior: Clip.antiAliasWithSaveLayer);
   }
 
-  Card menuCard(String title, IconData icon) {
+  Card menuCard(String title, IconData icon, {bool isActive = true}) {
     return Card(
       elevation: 2,
+      color: !isActive ? Colors.grey : null,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1741,6 +1553,15 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
     // await Future.delayed(Duration(seconds: 2));
     setState(() {});
   }
+
+  void _navigateAndRefresh(String route) async {
+    final result = await Get.toNamed(route, arguments: research.id);
+    if (result != null) {
+      refreshResearch();
+      Get.snackbar(result['title'], result['message'],
+          backgroundColor: Colors.white, icon: Icon(Icons.check_rounded));
+    }
+  }
 }
 
 class superviseBuilder extends StatelessWidget {
@@ -1767,8 +1588,6 @@ class superviseBuilder extends StatelessWidget {
             return const Expanded(
                 child: Center(child: Text('No Research Selected')));
           } else {
-            // print(snapshot.data[0].event_name);
-            // print(snapshot.data.length);
             return Expanded(
               child: ListView.builder(
                   shrinkWrap: true,

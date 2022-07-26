@@ -1,6 +1,7 @@
 import 'package:arsys/student/models/examiner_score.dart';
 
 class DefenseExaminerScore extends ExaminerScore {
+  int applicantId = -1;
   String? defenseNote;
 
   @override
@@ -12,7 +13,8 @@ class DefenseExaminerScore extends ExaminerScore {
     id = json['id'] ?? -1;
     examinerId = json['examiner_id'] ?? -1;
     eventId = json['event_id'] ?? -1;
+    applicantId = json['applicant_id'] ?? -1;
     mark = json['mark'] ?? -1;
-    defenseNote = json['seminar_note'] ?? "";
+    defenseNote = json['defense_note'] ?? "";
   }
 }

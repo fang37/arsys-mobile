@@ -15,6 +15,7 @@ class SupervisionController extends GetxController {
   var researches = List<Research>.empty().obs;
 
   Future researchUser() async {
+    researches.clear();
     if (researches.value.isEmpty) {
       var response;
       response = await Network().getResearch();
@@ -49,6 +50,7 @@ class SupervisionController extends GetxController {
   }
 
   Future<List<Research>> researchListUser() async {
+    researches.clear();
     if (researches.value.isEmpty) {
       var response;
       // TODO: make dedicated api for research list only
@@ -112,112 +114,6 @@ class SupervisionController extends GetxController {
     }
 
     return (research);
-  }
-
-  Future submissionSelector(Research res) async {
-    SubmissionType type = res.getSubmissionType();
-    switch (type) {
-      case SubmissionType.siasPro:
-        subbmitSiasPro(res);
-        break;
-      case SubmissionType.defense:
-        proposeDefense(res);
-        break;
-      case SubmissionType.turnitin:
-        requestTurnitinInvitation(res);
-        break;
-      case SubmissionType.finalDefense:
-        proposeDefense(res);
-        break;
-      default:
-        break;
-    }
-  }
-
-  Future subbmitSiasPro(Research res) async {
-    if (res.id != null && res.siasProPre == false) {
-      var response;
-      response = await Network().submitSiasProPre(res.id);
-      // print(response.bodyString);
-
-      var body;
-
-      try {
-        body = await json.decode(response.bodyString);
-      } catch (e) {
-        print(e);
-        return false;
-      }
-
-      try {
-        if (response.statusCode == HttpStatus.ok) {
-          res.siasProPre = true;
-          print(res);
-        }
-        return (res.siasProPre);
-      } catch (e) {
-        print(e);
-      }
-    }
-    return (res.siasProPre);
-  }
-
-  Future proposeDefense(Research res) async {
-    if (res.id != null && res.milestone!.proposeButton == true) {
-      var response;
-      response = await Network().proposeDefense(res.id);
-      // print(response.bodyString);
-
-      var body;
-
-      try {
-        body = await json.decode(response.bodyString);
-      } catch (e) {
-        print(e);
-        return false;
-      }
-
-      try {
-        if (response.statusCode == HttpStatus.ok) {
-          res.milestone!.proposeButton = false;
-          print(res);
-        }
-        return (res.milestone!.proposeButton);
-      } catch (e) {
-        print(e);
-      }
-    }
-    return (res.milestone!.proposeButton);
-  }
-
-  Future requestTurnitinInvitation(Research res) async {
-    if (res.id != null &&
-        res.milestone?.sequence == 6 &&
-        res.turnitinPre?.id == -1) {
-      var response;
-      response = await Network().requestTurnitinInvitation(res.id);
-      // print(response.bodyString);
-
-      var body;
-
-      try {
-        body = await json.decode(response.bodyString);
-      } catch (e) {
-        print(e);
-        return false;
-      }
-
-      try {
-        if (response.statusCode == HttpStatus.ok) {
-          return true;
-          print(res);
-        }
-        return false;
-      } catch (e) {
-        print(e);
-      }
-    }
-    return false;
   }
 
   Future submitDefenseReport(Research res, int applicantId,

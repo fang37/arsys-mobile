@@ -14,6 +14,13 @@ class SPV {
       supervisorScore?.add(SupervisorScore.fromJson(score));
     }
   }
+
+  SupervisorScore? getScore() {
+    for (SupervisorScore spv in supervisorScore ?? []) {
+      return spv;
+    }
+    return null;
+  }
 }
 
 

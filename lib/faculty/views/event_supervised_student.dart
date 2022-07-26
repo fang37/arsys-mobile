@@ -31,9 +31,6 @@ class _FacultyEventSupervisedStudentState
 
   @override
   void initState() {
-    print("BUILD ITEM APPLICANT ++++++++++");
-    print(eventC.getSupervisedApplicantByEvent(eventId));
-
     super.initState();
   }
 
@@ -44,8 +41,8 @@ class _FacultyEventSupervisedStudentState
       if (_selectedNavbar == 0) {
         Get.toNamed('/faculty-home');
       }
-      if (_selectedNavbar == 2) {
-        Get.toNamed('/faculty-event');
+      if (_selectedNavbar == 1) {
+        Get.toNamed('/faculty-supervision');
       }
       if (_selectedNavbar == 3) {
         Get.toNamed('/student-lecture');
@@ -57,7 +54,7 @@ class _FacultyEventSupervisedStudentState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF0F9FE),
-      appBar: AppBarBuilder(),
+      appBar: SecondAppBarBuilder("Event Applicant"),
       body: Platform.isIOS
           ? Container()
           : RefreshIndicator(
@@ -246,9 +243,9 @@ class _FacultyEventSupervisedStudentState
                                                                           () {
                                                                         if (spv !=
                                                                             null) {
-                                                                          inputMarkModal(spv
-                                                                              .supervisorScore
-                                                                              ?.first);
+                                                                          inputMarkModal(
+                                                                              applicant,
+                                                                              spv);
                                                                         }
                                                                       },
                                                                       child: Container(
@@ -332,7 +329,7 @@ class _FacultyEventSupervisedStudentState
     );
   }
 
-  void inputMarkModal(SupervisorScore? spv) {
+  void inputMarkModal(EventApplicant? applicant, SPV? spv) {
     TextEditingController markController = TextEditingController();
     TextEditingController notesController = TextEditingController();
     Get.defaultDialog(
@@ -389,12 +386,8 @@ class _FacultyEventSupervisedStudentState
       textConfirm: 'Submit',
       confirm: InkWell(
         onTap: () {
-          eventC.setSupervisorMark(
-              spv!.supervisorId,
-              spv.eventId,
-              spv.applicantId,
-              int.parse(markController.text),
-              notesController.text);
+          eventC.setSupervisorMark(spv!.id, applicant!.eventId, applicant.id,
+              int.parse(markController.text), notesController.text);
           Get.back();
           setState(() {});
         },

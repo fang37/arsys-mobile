@@ -22,21 +22,7 @@ class _FacultyEventState extends State<FacultyEvent> {
   String role = "";
   @override
   void initState() {
-    eventC.eventUser();
     super.initState();
-  }
-
-  _loadUserData() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var user = jsonDecode(localStorage.getString('user')!) ?? "";
-    var roles = localStorage.getString('roles') ?? "";
-
-    if (user != null) {
-      setState(() {
-        name = user['name'];
-        role = roles;
-      });
-    }
   }
 
   int _selectedNavbar = 2;

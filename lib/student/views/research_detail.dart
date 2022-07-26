@@ -128,8 +128,7 @@ class _StudentResearchDetailState extends State<StudentResearchDetail> {
                                         width: double.infinity,
                                         child: Card(
                                           elevation: 3,
-                                          color: researchC.cardColorBuilder(
-                                              research.milestone.milestone),
+                                          color: Colors.white,
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(15)),
@@ -138,53 +137,77 @@ class _StudentResearchDetailState extends State<StudentResearchDetail> {
                                                 shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            15.0))),
-                                            child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 10,
-                                                        horizontal: 10),
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    const Text("Information!",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black87,
-                                                            fontSize: 16,
-                                                            fontFamily:
-                                                                'OpenSans',
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
-                                                    Expanded(child: Center(child:
-                                                        SingleChildScrollView(
-                                                      child: Obx(() {
-                                                        return RichText(
-                                                          text: TextSpan(
-                                                              text:
-                                                                  "${research.information.value}",
-                                                              style: const TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontFamily:
-                                                                      'OpenSans',
-                                                                  color: Colors
-                                                                      .black87),
-                                                              recognizer:
-                                                                  TapGestureRecognizer()
-                                                                    ..onTap =
-                                                                        () {
-                                                                      titleModal(
-                                                                          context);
-                                                                    }),
-                                                        );
-                                                      }),
-                                                    )))
-                                                  ],
-                                                )),
+                                                            10.0))),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                      color: researchC
+                                                          .cardColorBuilder(
+                                                              research.milestone
+                                                                  .milestone),
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(10),
+                                                              topRight: Radius
+                                                                  .circular(
+                                                                      10))),
+                                                  child: const Center(
+                                                    child: Padding(
+                                                      padding:
+                                                          EdgeInsets.all(5.0),
+                                                      child: Text(
+                                                          "Information!",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black87,
+                                                              fontSize: 16,
+                                                              fontFamily:
+                                                                  'OpenSans',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                    child: Center(
+                                                        child:
+                                                            SingleChildScrollView(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 16.0,
+                                                        vertical: 8),
+                                                    child: Obx(() {
+                                                      return RichText(
+                                                        text: TextSpan(
+                                                            text:
+                                                                "${research.information.value}",
+                                                            style: const TextStyle(
+                                                                fontSize: 16,
+                                                                fontFamily:
+                                                                    'OpenSans',
+                                                                color: Colors
+                                                                    .black87),
+                                                            recognizer:
+                                                                TapGestureRecognizer()
+                                                                  ..onTap = () {
+                                                                    titleModal(
+                                                                        context);
+                                                                  }),
+                                                      );
+                                                    }),
+                                                  ),
+                                                )))
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),

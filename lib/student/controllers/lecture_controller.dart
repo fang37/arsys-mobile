@@ -28,14 +28,10 @@ class LectureController extends GetxController {
 
   var team;
 
-  Future lectureUser() async {
-    print("LECTURE USER 1");
+  Future? lectureUser() async {
     if (lecture.value.isEmpty) {
-      print("LECTURE USER 2");
       var response;
       response = await Network().getLecture(); // LECTURE PROVIDER
-      print(response.bodyString);
-      // print(lec.body);
       var body;
       try {
         body = await json.decode(response.bodyString);
@@ -49,12 +45,10 @@ class LectureController extends GetxController {
           lecture.value.clear();
           var bodies = body['schedules'];
           if (bodies.length != 0) {
-            print("LECTURE USER 3");
             for (var item in bodies) {
               lecture.add(Lecture.fromJson(item));
             }
           }
-          print(lecture);
         }
         // from low to high according to price
         lecture.sort((a, b) => a.semester!.compareTo(b.semester!));
@@ -68,12 +62,9 @@ class LectureController extends GetxController {
   }
 
   Future allLecture() async {
-    print("LECTURE USER 1");
     if (lectures.value.isEmpty) {
-      print("LECTURE USER 2");
       var response;
       response = await Network().getLectures(); // LECTURE PROVIDER
-      print(response.bodyString);
       var body;
 
       try {
@@ -88,12 +79,10 @@ class LectureController extends GetxController {
           lectures.value.clear();
           var bodies = body['schedules'];
           if (bodies.length != 0) {
-            print("LECTURE USER 3");
             for (var item in bodies) {
               lectures.add(Lecture.fromJson(item));
             }
           }
-          print(lectures);
         }
         // from low to high according to price
         lectures.sort((a, b) => a.semester!.compareTo(b.semester!));

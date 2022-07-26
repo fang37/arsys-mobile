@@ -55,17 +55,15 @@ class Room {
         presences.add(ex.presence);
       }
     }
-    print("GET EXAMINER != NULL");
-    print("$presences");
     return presences;
   }
 
   bool getExaminerPresence(int facultyId) {
-    SeminarExaminer? userExaminer;
     if (examiner != null && examiner!.isNotEmpty) {
-      userExaminer = examiner?.singleWhere((ex) => ex.examinerId == facultyId);
-      if (userExaminer != null) {
-        return userExaminer.presence;
+      for (SeminarExaminer ex in examiner!) {
+        if (ex.examinerId == facultyId) {
+          return ex.presence;
+        }
       }
     }
     return false;
@@ -73,8 +71,12 @@ class Room {
 
   SeminarExaminer? getExaminerByUser(int facultyId) {
     SeminarExaminer? result;
-    if (examiner != null) {
-      result = examiner?.singleWhere((ex) => ex.examinerId == facultyId);
+    if (examiner != null && examiner != []) {
+      for (SeminarExaminer ex in examiner!) {
+        if (ex.examinerId == facultyId) {
+          result = ex;
+        }
+      }
     }
     return result;
   }

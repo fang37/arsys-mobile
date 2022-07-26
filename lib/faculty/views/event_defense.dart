@@ -5,9 +5,13 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:arsys/controllers/user_controller.dart';
 import 'package:arsys/student/controllers/event_controller.dart';
 import 'package:arsys/student/controllers/research_controller.dart';
+import 'package:arsys/student/models/defense_examiner.dart';
 import 'package:arsys/student/models/event.dart';
+import 'package:arsys/student/models/event_applicant.dart';
+import 'package:arsys/student/models/examiner.dart';
 import 'package:arsys/student/models/research.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/gestures.dart';
@@ -28,8 +32,8 @@ class FacultyEventDefense extends StatefulWidget {
 class _FacultyEventDefenseState extends State<FacultyEventDefense> {
   final researchC = Get.find<ResearchController>();
   final eventC = Get.find<EventController>();
+  final userC = Get.find<UserController>();
   late Event event = Get.arguments;
-  late Research research;
   ScrollController scrollC = new ScrollController();
   @override
   void initState() {
@@ -41,11 +45,11 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 0) {
-        Get.toNamed('/faulty-home');
+        Get.toNamed('/faculty-home');
       }
       // if (_selectedNavbar == 1) () => Get.back();
-      if (_selectedNavbar == 2) {
-        Get.toNamed('/faculty-event');
+      if (_selectedNavbar == 1) {
+        Get.toNamed('/faculty-supervision');
       }
       if (_selectedNavbar == 3) {
         Get.toNamed('/student-lecture');
@@ -130,9 +134,10 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
                           physics: const BouncingScrollPhysics(),
                           itemCount: snapshot.data.length,
                           itemBuilder: (context, index) {
+                            EventApplicant? applicant = snapshot.data[index];
                             return FutureBuilder<dynamic>(
-                                future: researchC.researchById(
-                                    snapshot.data[index].researchId),
+                                future: researchC
+                                    .researchById(applicant?.researchId ?? -1),
                                 builder: (context, researchSnapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
@@ -140,7 +145,7 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
                                       child: CircularProgressIndicator(),
                                     );
                                   } else if (researchSnapshot.hasData) {
-                                    research = researchSnapshot.data;
+                                    Research research = researchSnapshot.data;
                                     return Expanded(
                                         child: Padding(
                                       padding: const EdgeInsets.all(5.0),
@@ -197,7 +202,7 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
                                                       ],
                                                     ),
                                                     Text(
-                                                        "${research.student?.studentNumber} - ${research.student?.specialization}",
+                                                        "${research.student?.studentNumber} - ${research.student?.specialization} - ${research.getSupervisorCode()}",
                                                         style: const TextStyle(
                                                             fontFamily:
                                                                 'Helvetica',
@@ -208,111 +213,26 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
                                                       indent: 5,
                                                       endIndent: 5,
                                                     ),
-                                                    SizedBox(
-                                                      width: double.infinity,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 5),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            const Text(
-                                                                "Schedule",
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'Helvetica',
-                                                                    color: Colors
-                                                                        .black54)),
-                                                            snapshot.data[index]
-                                                                        .getExaminerCode() ==
-                                                                    "-"
-                                                                ? const Text(
-                                                                    "This event is not scheduled yet.",
-                                                                    style: TextStyle(
-                                                                        fontFamily:
-                                                                            'Helvetica',
-                                                                        color: Colors
-                                                                            .black87))
-                                                                : applicantSchedule(
-                                                                    snapshot,
-                                                                    index),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
+                                                    defenseSchedule(
+                                                        snapshot, index),
                                                     const Divider(
                                                       thickness: 1,
                                                       indent: 5,
                                                       endIndent: 5,
                                                     ),
-                                                    const Center(
-                                                      child: Text("Examiner",
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'Helvetica',
-                                                              color: Colors
-                                                                  .black54)),
-                                                    ),
-                                                    snapshot
-                                                                .data[index]
-                                                                .getExaminerCode() ==
-                                                            "-"
-                                                        ? const Text(
-                                                            "This event is not scheduled yet.",
-                                                            style: const TextStyle(
-                                                                fontFamily:
-                                                                    'Helvetica',
-                                                                color: Colors
-                                                                    .black87))
-                                                        : Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10.0),
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      left: 5),
-                                                              child: Container(
-                                                                  margin: const EdgeInsets.only(
-                                                                      top: 8),
-                                                                  padding:
-                                                                      const EdgeInsets.all(
-                                                                          8),
-                                                                  decoration: BoxDecoration(
-                                                                      color:
-                                                                          Colors.blueGrey[
-                                                                              50],
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15.0)),
-                                                                  child: Text(
-                                                                      " ${snapshot.data[index].getExaminerCode()}",
-                                                                      style: const TextStyle(
-                                                                          fontSize:
-                                                                              16,
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontFamily:
-                                                                              'Helvetica',
-                                                                          color:
-                                                                              const Color(0xff3A4856)))),
-                                                            ),
-                                                          ),
-                                                    (snapshot.data[index]
-                                                                .getExaminerCode() ==
-                                                            "-")
-                                                        ? Container()
-                                                        : Padding(
+                                                    defenseExaminer(
+                                                        snapshot, index),
+                                                    (research.isSupervisor(userC
+                                                                .getId()) &&
+                                                            applicant
+                                                                    ?.getExaminerCode() !=
+                                                                "-")
+                                                        ? Padding(
                                                             padding:
                                                                 const EdgeInsets
                                                                         .fromLTRB(
                                                                     10,
-                                                                    10,
+                                                                    0,
                                                                     10,
                                                                     0),
                                                             child: SizedBox(
@@ -331,8 +251,8 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
                                                                             BorderRadius.circular(15))),
                                                                 child:
                                                                     const Text(
-                                                                  "Presence",
-                                                                  style: const TextStyle(
+                                                                  "Make a presence",
+                                                                  style: TextStyle(
                                                                       color: Colors
                                                                           .white,
                                                                       fontFamily:
@@ -342,21 +262,19 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
                                                                               .bold),
                                                                 ),
                                                                 onPressed: () {
-                                                                  Clipboard.setData(new ClipboardData(
-                                                                      text: snapshot
-                                                                          .data[
-                                                                              index]
-                                                                          .getShareableScheduleLink()));
-                                                                  Get.snackbar(
-                                                                      "Text copied!",
-                                                                      "Meeting details has been copied to your clipboard",
-                                                                      snackPosition:
-                                                                          SnackPosition
-                                                                              .BOTTOM);
+                                                                  setState(
+                                                                      () {});
+                                                                  presenceModal(
+                                                                      context,
+                                                                      applicant!,
+                                                                      research);
                                                                 },
                                                               ),
                                                             ),
                                                           )
+                                                        : Container(),
+                                                    defenseScore(
+                                                        applicant, research)
                                                   ],
                                                 ),
                                               ),
@@ -374,6 +292,166 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
                     ;
                   })),
         ]);
+  }
+
+  Padding defenseScore(EventApplicant? applicant, Research? research) {
+    int? score;
+    String? role;
+    if (applicant!.isExaminer(userC.getId())) {
+      score = applicant.getExaminerByUser(userC.getId())?.score?.mark;
+      role = 'examiner';
+    }
+    if (research!.isSupervisor(userC.getId())) {
+      score = research.getSupervisorScore(userC.getId());
+      role = 'supervisor';
+    }
+    if (score == -1) {
+      score = null;
+    }
+    return Padding(
+        padding: EdgeInsets.all(8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Your Mark ",
+              style: TextStyle(
+                  color: Color(0xff3A4856),
+                  fontSize: 14,
+                  fontFamily: 'OpenSans'),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                  color: Colors.red[100],
+                  borderRadius: BorderRadius.circular(8.0)),
+              child: InkWell(
+                child: Text(
+                  // ${applicant.get getApplicantScore(applicant.id) ??
+                  "${score ?? 'Unmarked'}",
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 37, 45, 54),
+                      fontSize: 20,
+                      fontFamily: 'OpenSans',
+                      fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  if (role == 'supervisor') {
+                    print("execute submit supervisor");
+                  } else if (role == 'examiner') {
+                    DefenseExaminer examiner =
+                        applicant.getExaminerByUser(userC.getId())!;
+                    if (examiner.presence) {
+                      inputExaminerMarkModal(examiner);
+                      // eventC.setExaminerMark(examinerId, mark, defenseNotes)
+                    } else {
+                      if (!Get.isSnackbarOpen) {
+                        Get.showSnackbar(const GetSnackBar(
+                          message: "You must be presence before input mark",
+                          duration: Duration(seconds: 2),
+                          icon: Icon(
+                            Icons.warning_rounded,
+                            color: Colors.white,
+                          ),
+                        ));
+                      }
+                    }
+                  } else {
+                    return null;
+                  }
+                },
+              ),
+            ),
+          ],
+        ));
+  }
+
+  SizedBox defenseExaminer(AsyncSnapshot<dynamic> snapshot, int index) {
+    EventApplicant? applicant = snapshot.data[index];
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: Column(
+          children: [
+            const Center(
+              child: Text("Examiner",
+                  style: TextStyle(
+                      fontFamily: 'Helvetica', color: Colors.black54)),
+            ),
+            applicant?.getExaminerCode() == "-"
+                ? const Text("This event is not scheduled yet.",
+                    style: TextStyle(
+                        fontFamily: 'Helvetica', color: Colors.black87))
+                : ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: applicant?.examiner?.length,
+                    itemBuilder: (context, i) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 8),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(8.0)),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                (applicant?.examiner?[i].presence == true)
+                                    ? const Icon(
+                                        Icons.check_circle_rounded,
+                                        color: Colors.greenAccent,
+                                        size: 20,
+                                      )
+                                    : const Icon(
+                                        Icons.do_disturb_alt_rounded,
+                                        color: Colors.redAccent,
+                                        size: 20,
+                                      ),
+                                Flexible(
+                                  child: Text(
+                                      " ${applicant?.examiner?[i].faculty?.getFullNameAndTitle()} ",
+                                      overflow: TextOverflow.ellipsis,
+                                      softWrap: false,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'OpenSans',
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xff3A4856))),
+                                ),
+                              ],
+                            )),
+                      );
+                    }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SizedBox defenseSchedule(AsyncSnapshot<dynamic> snapshot, int index) {
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text("Schedule",
+                style:
+                    TextStyle(fontFamily: 'Helvetica', color: Colors.black54)),
+            snapshot.data[index].getExaminerCode() == "-"
+                ? const Text("This event is not scheduled yet.",
+                    style: TextStyle(
+                        fontFamily: 'Helvetica', color: Colors.black87))
+                : applicantSchedule(snapshot, index),
+          ],
+        ),
+      ),
+    );
   }
 
   SizedBox applicantSchedule(AsyncSnapshot<dynamic> snapshot, int index) {
@@ -625,141 +703,285 @@ class _FacultyEventDefenseState extends State<FacultyEventDefense> {
     }
   }
 
-  Future<dynamic> submissionModal(BuildContext context) {
+  void inputExaminerMarkModal(DefenseExaminer examiner) {
+    TextEditingController markController = TextEditingController();
+    TextEditingController notesController = TextEditingController();
+    Get.defaultDialog(
+      contentPadding: const EdgeInsets.all(20),
+      title: 'Input Mark',
+      titleStyle: const TextStyle(
+          fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xff3A4856)),
+      titlePadding: const EdgeInsets.only(top: 15),
+      content: Column(
+        children: [
+          Form(
+            autovalidateMode: AutovalidateMode.always,
+            child: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter mark';
+                } else if (int.parse(value) < 0 || int.parse(value) > 400) {
+                  return 'Mark must be between 0 and 400';
+                }
+                return null;
+              },
+              maxLength: 3,
+              controller: markController,
+              decoration: const InputDecoration(
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+                labelText: "Input mark",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                filled: true,
+              ),
+            ),
+          ),
+          Form(
+            autovalidateMode: AutovalidateMode.always,
+            child: TextFormField(
+              controller: notesController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+                labelText: "Input defense's notes",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                filled: true,
+              ),
+            ),
+          ),
+        ],
+      ),
+      textCancel: 'Cancel',
+      textConfirm: 'Submit',
+      confirm: InkWell(
+        onTap: () {
+          eventC.setExaminerMark(examiner.id, int.parse(markController.text),
+              notesController.text);
+          setState(() {});
+          Get.back();
+        },
+        child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+                color: Colors.redAccent,
+                borderRadius: BorderRadius.circular(8.0)),
+            child: const Text(
+              "Submit",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'OpenSans',
+                  fontWeight: FontWeight.bold),
+            )),
+      ),
+      cancel: InkWell(
+        onTap: (() => Get.back()),
+        child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+                color: Colors.grey, borderRadius: BorderRadius.circular(8.0)),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'OpenSans',
+                  fontWeight: FontWeight.bold),
+            )),
+      ),
+      radius: 15,
+    );
+  }
+
+  Future<dynamic> presenceModal(
+      BuildContext context, EventApplicant applicant, Research research) {
+    List<bool>? _isSelected = List<bool>.empty();
+    _isSelected = applicant.getExaminerDefensePresence();
     return showModalBottomSheet(
         context: context,
         builder: (context) {
-          return StatefulBuilder(builder: (context, StateSetter modalstate) {
-            return Padding(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
-                color: Colors.lightBlueAccent,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Submission',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontFamily: 'OpenSans',
-                                fontWeight: FontWeight.bold)),
-                        IconButton(
-                          onPressed: () {
-                            if (Get.isBottomSheetOpen != null) {
-                              Get.back();
-                            }
-                          },
-                          icon: const Icon(Icons.close_rounded),
-                          color: Colors.white,
-                        )
-                      ],
-                    ),
-                    Flexible(
-                      child: (!research.getSubmissionButton())
-                          ? Text(research.getSubmissionTitle(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontFamily: 'OpenSans',
-                              ))
-                          : Card(
-                              elevation: 4.0,
-                              color: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              child: ClipPath(
-                                clipper: ShapeBorderClipper(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(15.0))),
-                                child: Scrollbar(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: FutureBuilder(
-                                        builder: (context, snapshot) {
-                                      return Column(
-                                        children: [
-                                          Text(research.getSubmissionTitle(),
-                                              style: const TextStyle(
-                                                  color: Colors.black87,
-                                                  fontSize: 16,
-                                                  fontFamily: 'OpenSans',
-                                                  fontWeight: FontWeight.bold)),
-                                          Text(
-                                              research
-                                                  .getSubmissionDescription(),
-                                              style: const TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 16,
-                                                fontFamily: 'OpenSans',
-                                              )),
-                                        ],
-                                      );
-                                    }),
-                                  ),
-                                ),
-                              ),
-                            ),
-                    ),
-                    !research.getSubmissionButton()
-                        ? Container()
-                        : ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                primary: Colors.lightBlueAccent.shade700,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15))),
-                            child: const Text(
-                              "SUBMIT",
+          print("CHECK ${research.title}");
+          if (research.isSupervisor(userC.getId())) {
+            return StatefulBuilder(builder: (context, StateSetter modalState) {
+              return Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+                  color: Colors.lightBlueAccent,
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Make a presence',
                               style: TextStyle(
                                   color: Colors.white,
-                                  fontFamily: 'Helvetica',
-                                  fontWeight: FontWeight.bold),
-                            ),
+                                  fontSize: 16,
+                                  fontFamily: 'OpenSans',
+                                  fontWeight: FontWeight.bold)),
+                          IconButton(
                             onPressed: () {
-                              if (research.getSubmissionButton() == false) {
-                                return;
-                              } else {
-                                Get.defaultDialog(
-                                    contentPadding: const EdgeInsets.all(15),
-                                    title: 'Confirmation',
-                                    titleStyle: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xff3A4856)),
-                                    titlePadding:
-                                        const EdgeInsets.only(top: 15),
-                                    content: Text(
-                                      research.getSubmissionDescription(),
-                                      style: const TextStyle(
-                                          color: const Color(0xff3A4856)),
-                                    ),
-                                    textCancel: 'Cancel',
-                                    textConfirm: 'Yes',
-                                    confirmTextColor: Colors.white,
-                                    radius: 15,
-                                    onConfirm: () {
-                                      researchC.submissionSelector(research);
-                                      research.updateInformation();
-                                      refreshResearch();
-
-                                      Get.back();
-                                      Get.back();
-                                    });
+                              if (Get.isBottomSheetOpen != null) {
+                                Get.back();
                               }
                             },
+                            icon: const Icon(Icons.close_rounded),
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
+                      Flexible(
+                        child: Card(
+                          elevation: 4.0,
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: ClipPath(
+                            clipper: ShapeBorderClipper(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0))),
+                            child: Scrollbar(
+                              child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 10),
+                                  child: Column(
+                                    children: [
+                                      const Center(
+                                        child: Text(
+                                            "Tap on icon to change a presence state and hit submit",
+                                            style: TextStyle(
+                                                fontFamily: 'Helvetica',
+                                                color: Colors.black54)),
+                                      ),
+                                      const Divider(
+                                        thickness: 1,
+                                        indent: 5,
+                                        endIndent: 5,
+                                      ),
+                                      ListView.builder(
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          itemCount: applicant.examiner?.length,
+                                          itemBuilder: (context, i) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 5,
+                                                      horizontal: 8),
+                                              child: Container(
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.transparent,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0)),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      ToggleButtons(
+                                                        children: [
+                                                          (_isSelected![i] ==
+                                                                  true)
+                                                              ? const Icon(
+                                                                  Icons
+                                                                      .check_circle_rounded,
+                                                                  color: Colors
+                                                                      .greenAccent,
+                                                                  size: 20,
+                                                                )
+                                                              : const Icon(
+                                                                  Icons
+                                                                      .do_disturb_alt_rounded,
+                                                                  color: Colors
+                                                                      .redAccent,
+                                                                  size: 20,
+                                                                )
+                                                        ],
+                                                        isSelected: [
+                                                          _isSelected[i]
+                                                        ],
+                                                        onPressed: (_) {
+                                                          modalState(() {
+                                                            _isSelected![i] =
+                                                                !_isSelected[i];
+                                                          });
+                                                        },
+                                                        renderBorder: false,
+                                                        selectedColor: Colors
+                                                            .lightGreen[50],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(90),
+                                                      ),
+                                                      Flexible(
+                                                        child: Text(
+                                                            " ${applicant.examiner?[i].faculty?.getFullNameAndTitle()} ",
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            softWrap: false,
+                                                            style: const TextStyle(
+                                                                fontSize: 16,
+                                                                fontFamily:
+                                                                    'OpenSans',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: const Color(
+                                                                    0xff3A4856))),
+                                                      ),
+                                                    ],
+                                                  )),
+                                            );
+                                          }),
+                                    ],
+                                  )),
+                            ),
                           ),
-                  ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.lightBlueAccent.shade700,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15))),
+                        child: const Text(
+                          "SUBMIT",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Helvetica',
+                              fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () async {
+                          List<Examiner>? examiners = applicant.examiner;
+                          print("PRESENCE SUMBITTED");
+                          await eventC.setPresenceDefenseExaminer(
+                              _isSelected!, examiners);
+                          setState(() {});
+                          modalState() {}
+                          Get.back();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          });
+              );
+            });
+          } else {
+            return Container();
+          }
         },
         shape: const RoundedRectangleBorder(
           borderRadius: const BorderRadius.vertical(

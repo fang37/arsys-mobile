@@ -13,21 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ResearchController extends GetxController {
   var research;
   var researches = List<Research>.empty().obs;
-  // int? id;
-  // int? research_type;
-  // String? research_code;
-  // String? title;
-  // String? abstract;
-  // int? research_milestone;
-  // int? status;
-  // String? approval_date;
-  // String? research_id
-  // var supervisor;
-  // var supervise;
-  // var milestone;
-  // DefenseApproval? defenseApproval;
 
   Future researchUser() async {
+    researches.clear();
     if (researches.value.isEmpty) {
       var response;
       response = await Network().getResearch();
@@ -62,6 +50,7 @@ class ResearchController extends GetxController {
   }
 
   Future<List<Research>> researchListUser() async {
+    researches.clear();
     if (researches.value.isEmpty) {
       var response;
       response = await Network().getResearch();

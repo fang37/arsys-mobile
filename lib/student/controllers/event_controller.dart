@@ -47,6 +47,7 @@ class EventController extends GetxController {
   }
 
   Future eventUser() async {
+    event.clear();
     if (event.value.isEmpty) {
       var response;
       response = await Network().getEvent();
@@ -80,6 +81,7 @@ class EventController extends GetxController {
   }
 
   Future eventsUser() async {
+    events.clear();
     if (events.value.isEmpty) {
       var response;
       response = await Network().getEvents();
@@ -284,9 +286,44 @@ class EventController extends GetxController {
     return false;
   }
 
+  Future<bool> setPresenceDefenseExaminer(
+      List<bool> newPresence, List<Examiner>? examiners) async {
+    var resultResponses = List<bool>.empty(growable: true);
+    if (newPresence != null && examiners != null) {
+      if (newPresence.length == examiners.length) {
+        for (int index = 0; index < examiners.length; index++) {
+          if (examiners[index].presence != newPresence[index]) {
+            var response;
+            response = await Network().setPresenceDefenseExaminer(
+                examiners[index].id, newPresence[index]);
+            print(response.bodyString);
+            var body;
+
+            try {
+              body = await json.decode(response.bodyString);
+            } catch (e) {
+              print(e);
+              resultResponses.add(false);
+            }
+
+            try {
+              if (response.statusCode == HttpStatus.ok) {
+                resultResponses.add(true);
+              }
+            } catch (e) {
+              print(e);
+              resultResponses.add(false);
+            }
+          }
+        }
+        return resultResponses.every((element) => element == true);
+      }
+    }
+    return false;
+  }
+
   Future<bool> setPresenceRoomExaminer(
       List<bool> newPresence, List<Examiner>? examiners) async {
-    print("RIGHT HERE");
     var resultResponses = List<bool>.empty(growable: true);
     if (newPresence != null && examiners != null) {
       if (newPresence.length == examiners.length) {
@@ -323,8 +360,6 @@ class EventController extends GetxController {
 
   Future<bool> setMarkRoomExaminer(
       int scoreId, int mark, String? seminarNotes) async {
-    print("RIGHT HERE");
-
     if (scoreId != null && mark != null) {
       var response;
       response = await Network()
@@ -361,6 +396,35 @@ class EventController extends GetxController {
       var response;
       response = await Network().setSupervisorMark(
           supervisorId, eventId, applicantId, mark, seminarNotes ?? "");
+      // print(response.bodyString);
+
+      var body;
+
+      try {
+        body = await json.decode(response.bodyString);
+      } catch (e) {
+        print(e);
+        return false;
+      }
+
+      try {
+        if (response.statusCode == HttpStatus.ok) {
+          return true;
+        }
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  Future<bool> setExaminerMark(
+      int examinerId, int mark, String? defenseNotes) async {
+    if (examinerId != null && mark != null) {
+      var response;
+      response =
+          await Network().setExaminerMark(examinerId, mark, defenseNotes ?? "");
       // print(response.bodyString);
 
       var body;

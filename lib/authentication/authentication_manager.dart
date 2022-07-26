@@ -32,8 +32,13 @@ class AuthenticationManager extends GetxController with CacheManager {
     removeRole();
     activeRole = "";
     isLogged.value = false;
-    userC.user.id = -1;
+    if (userC.user != null) {
+      userC.user.id = -1;
+    } else {
+      userC.user = null;
+    }
     Get.offNamedUntil('/', (route) => false);
+
     // await fcmC.removeToken();
   }
 

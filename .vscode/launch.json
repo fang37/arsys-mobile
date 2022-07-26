@@ -22,6 +22,12 @@
             "flutterMode": "release"
         },
         {
+            "name": "RMX1801",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "ca48a4ff"
+        },
+        {
             "name": "Pixel 4 XL API 30",
             "request": "launch",
             "type": "dart",
@@ -40,6 +46,7 @@
             "configurations": [
                 "Pixel 4 XL API 30",
                 "Pixel 4 XL API 30 2",
+                "ArSys-Mobile"
             ],
         }
     ]

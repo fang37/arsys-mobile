@@ -150,6 +150,26 @@ class Network extends GetConnect {
     }
   }
 
+  setPresenceDefenseExaminer(int? examinerId, bool newPresence) async {
+    if (examinerId != null) {
+      int presenceInInt = newPresence ? 1 : 0;
+      var data = {'examiner_id': '$examinerId', 'presence': '$presenceInInt'};
+      await _getToken();
+      var fullUrl = arsysUrl("event-applicant/defense/presence");
+      try {
+        print("$data");
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   setPresenceRoomExaminer(int? id, bool newPresence) async {
     if (id != null) {
       int presenceInInt = newPresence ? 1 : 0;
@@ -205,6 +225,29 @@ class Network extends GetConnect {
       };
       await _getToken();
       var fullUrl = arsysUrl("event-applicant/supervisor/score");
+      try {
+        print("$data");
+        return post(fullUrl, jsonEncode(data), headers: _setHeaders());
+        // return await http.post(Uri.parse(fullUrl),
+        //     body: jsonEncode(data), headers: _setHeaders());
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  setExaminerMark(int examinerId, int mark, String? defenseNotes) async {
+    if (mark != null) {
+      var data = {
+        'examiner_id': '$examinerId',
+        'mark': '$mark',
+        'defense_note': '$defenseNotes'
+      };
+      await _getToken();
+      var fullUrl = arsysUrl("event-applicant/examiner/score");
       try {
         print("$data");
         return post(fullUrl, jsonEncode(data), headers: _setHeaders());

@@ -59,7 +59,7 @@ class _FacultyHomeState extends State<FacultyHome> {
           : RefreshIndicator(
               displacement: 40,
               edgeOffset: 10,
-              onRefresh: refreshEvent,
+              onRefresh: refreshProfil,
               child: SafeArea(
                 child: Container(
                   padding: EdgeInsets.all(15),
@@ -180,13 +180,9 @@ class _FacultyHomeState extends State<FacultyHome> {
     );
   }
 
-  Future refreshEvent() async {
+  Future refreshProfil() async {
     profileC.profileClear();
     profileC.getProfile();
-    eventC.event.clear();
-    eventC.eventUser();
-    eventC.events.clear();
-    eventC.eventsUser();
     await Future.delayed(Duration(seconds: 2));
     setState(() {});
   }

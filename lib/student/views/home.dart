@@ -19,15 +19,12 @@ class StudentHome extends StatefulWidget {
 
 class _StudentHomeState extends State<StudentHome> {
   final fcmC = Get.find<FCMController>();
-  final researchC = Get.find<ResearchController>();
-  final eventC = Get.find<EventController>();
+  // final researchC = Get.find<ResearchController>();
+  // final eventC = Get.find<EventController>();
   final profileC = Get.find<UserController>();
   @override
   void initState() {
-    researchC.researchListUser();
     profileC.getProfile();
-    eventC.eventUser();
-    eventC.eventsUser();
     fcmC.sendToken();
     fcmC.receiveNotification();
     super.initState();
@@ -59,7 +56,7 @@ class _StudentHomeState extends State<StudentHome> {
           : RefreshIndicator(
               displacement: 40,
               edgeOffset: 10,
-              onRefresh: refreshEvent,
+              onRefresh: refreshHome,
               child: SafeArea(
                 child: Container(
                   padding: EdgeInsets.all(15),
@@ -79,13 +76,6 @@ class _StudentHomeState extends State<StudentHome> {
                               decoration: BoxDecoration(
                                 borderRadius:
                                     BorderRadiusDirectional.circular(10),
-                                // gradient: LinearGradient(
-                                //     colors: [
-                                //       Colors.lightBlueAccent,
-                                //       Color(0xFF0277E3)
-                                //     ],
-                                //     begin: Alignment.bottomLeft,
-                                //     end: Alignment.topRight)
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -102,7 +92,7 @@ class _StudentHomeState extends State<StudentHome> {
                                             Get.toNamed('/student-research');
                                           },
                                           icon: Icon(Icons.book_rounded)),
-                                      Text(
+                                      const Text(
                                         "Research",
                                         style: TextStyle(
                                             fontFamily: "OpenSans",
@@ -122,7 +112,7 @@ class _StudentHomeState extends State<StudentHome> {
                                             Get.toNamed('/student-event');
                                           },
                                           icon: Icon(Icons.event)),
-                                      Text(
+                                      const Text(
                                         "Event",
                                         style: TextStyle(
                                             fontFamily: "OpenSans",
@@ -142,7 +132,7 @@ class _StudentHomeState extends State<StudentHome> {
                                             Get.toNamed('/student-lecture');
                                           },
                                           icon: Icon(Icons.schedule)),
-                                      Text(
+                                      const Text(
                                         "Lecture",
                                         style: TextStyle(
                                             fontFamily: "OpenSans",
@@ -168,7 +158,7 @@ class _StudentHomeState extends State<StudentHome> {
         elevation: 3,
         style: TabStyle.flip,
         height: 60,
-        items: [
+        items: const [
           TabItem(icon: Icons.home, title: 'Home'),
           TabItem(icon: Icons.book_rounded, title: 'Research'),
           TabItem(icon: Icons.event, title: 'Event'),
@@ -180,13 +170,9 @@ class _StudentHomeState extends State<StudentHome> {
     );
   }
 
-  Future refreshEvent() async {
+  Future refreshHome() async {
     profileC.profileClear();
     profileC.getProfile();
-    eventC.event.clear();
-    eventC.eventUser();
-    eventC.events.clear();
-    eventC.eventsUser();
     await Future.delayed(Duration(seconds: 2));
     setState(() {});
   }

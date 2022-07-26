@@ -186,8 +186,10 @@ class Research {
   int? getSupervisorScore(int facultyId) {
     for (SPV item in spv!) {
       if (item.supervisorId == facultyId) {
-        if (item.supervisorScore?.first.mark != -1) {
-          return item.supervisorScore?.first.mark;
+        if (item.supervisorScore!.isNotEmpty) {
+          if (item.supervisorScore?.first.mark != -1) {
+            return item.supervisorScore?.first.mark;
+          }
         }
       }
     }

@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:arsys/controllers/user_controller.dart';
+import 'package:arsys/models/role.dart';
 import 'package:arsys/student/controllers/lecture_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ class Lecture extends StatefulWidget {
 
 class _LectureState extends State<Lecture> {
   final lectureC = Get.find<LectureController>();
+  final userC = Get.find<UserController>();
   TextEditingController searchController = TextEditingController();
 
   String? semester = '';
@@ -22,7 +25,6 @@ class _LectureState extends State<Lecture> {
 
   @override
   void initState() {
-    lectureC.lectureUser();
     super.initState();
   }
 
@@ -31,13 +33,25 @@ class _LectureState extends State<Lecture> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 0) {
-        Get.toNamed('/student-home');
+        if (userC.user.getRole() == Role.student.value) {
+          Get.toNamed('/student-home');
+        } else {
+          Get.toNamed('/faculty-home');
+        }
       }
       if (_selectedNavbar == 1) {
-        Get.toNamed('/student-research');
+        if (userC.user.getRole() == Role.student.value) {
+          Get.toNamed('/student-research');
+        } else {
+          Get.toNamed('/faculty-supervision');
+        }
       }
       if (_selectedNavbar == 2) {
-        Get.toNamed('/student-event');
+        if (userC.user.getRole() == Role.student.value) {
+          Get.toNamed('/student-event');
+        } else {
+          Get.toNamed('/faculty-event');
+        }
       }
     });
   }
@@ -337,24 +351,24 @@ class _LectureState extends State<Lecture> {
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return Center(
+                                return const Center(
                                   child: CircularProgressIndicator(),
                                 );
-                              } else if (snapshot.data.length == 0) {
-                                return Expanded(
+                              } else if (!snapshot.hasData) {
+                                print("No DATA");
+
+                                return const Expanded(
                                     child: Center(child: Text('No Lecture')));
                               } else {
-                                // print(snapshot.data[0].event_name);
-                                // print(snapshot.data.length);
                                 return ClipPath(
-                                  clipper: ShapeBorderClipper(
+                                  clipper: const ShapeBorderClipper(
                                       shape: RoundedRectangleBorder(
                                           // borderRadius:
                                           // BorderRadius.circular(10.0)
                                           )),
                                   child: Scrollbar(
                                     child: ListView.builder(
-                                        physics: BouncingScrollPhysics(),
+                                        physics: const BouncingScrollPhysics(),
                                         itemCount: snapshot.data.length,
                                         itemBuilder: (context, index) {
                                           if (searchController.text.isEmpty) {
@@ -771,10 +785,8 @@ class _LectureState extends State<Lecture> {
 
   Future refreshResearch() async {
     lectureC.lecture.clear();
-    print("1 MASIH OKE");
     lectureC.lectureUser();
     // await Future.delayed(Duration(seconds: 2));
-    print("3 MASIH OKE");
     setState(() {});
   }
 

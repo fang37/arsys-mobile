@@ -943,45 +943,60 @@ class _StudentResearchEventState extends State<StudentResearchEvent> {
           width: double.infinity,
           child: Card(
             elevation: 3,
-            color: researchC.cardColorBuilder(research.milestone.milestone),
+            color: Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: ClipPath(
               clipper: ShapeBorderClipper(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.0))),
-              child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text("Information!",
-                          style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 16,
-                              fontFamily: 'OpenSans',
-                              fontWeight: FontWeight.bold)),
-                      Expanded(
-                          child: Center(
-                              child: SingleChildScrollView(
-                        child: RichText(
-                          text: TextSpan(
-                              text:
-                                  "Apply for ${research.milestone?.milestone} Event",
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'OpenSans',
-                                  color: Colors.black87),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  titleModal(context);
-                                }),
-                        ),
-                      )))
-                    ],
-                  )),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        color: researchC
+                            .cardColorBuilder(research.milestone.milestone),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Center(
+                        child: Text("Information!",
+                            style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: 16,
+                                fontFamily: 'OpenSans',
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8),
+                    child: Center(
+                        child: SingleChildScrollView(
+                      child: RichText(
+                        text: TextSpan(
+                            text:
+                                "Apply for ${research.milestone?.milestone} Event",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'OpenSans',
+                                color: Colors.black87),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                titleModal(context);
+                              }),
+                      ),
+                    )),
+                  ))
+                ],
+              ),
             ),
           ),
         ),

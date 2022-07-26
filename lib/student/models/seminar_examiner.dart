@@ -27,8 +27,11 @@ class SeminarExaminer extends Examiner {
     int? applicantScore;
     if (score != null && score!.isNotEmpty) {
       // TODO: APPLICANT BISA EMPTY
-      // for (SeminarExaminerScore? s in score) {}
-      applicantScore = score?.singleWhere((s) => s.applicantId == appId).mark;
+      for (SeminarExaminerScore? s in score!) {
+        if (s?.applicantId == appId) {
+          applicantScore = s?.mark;
+        }
+      }
     }
     if (applicantScore == -1) {
       return null;

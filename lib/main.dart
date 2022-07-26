@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fcmC = Get.put(FCMController());
-    final profileC = Get.put(UserController());
+    final userC = Get.put(UserController());
     final eventC = Get.put(EventController());
     // final studentProfileC = Get.put(StudentController());
     // final facultyProfileC = Get.put(FacultyController());

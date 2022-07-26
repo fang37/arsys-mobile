@@ -46,11 +46,11 @@ class _FacultyEventSeminarState extends State<FacultyEventSeminar> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 0) {
-        Get.toNamed('/faulty-home');
+        Get.toNamed('/faculty-home');
       }
       // if (_selectedNavbar == 1) () => Get.back();
-      if (_selectedNavbar == 2) {
-        Get.toNamed('/faculty-event');
+      if (_selectedNavbar == 1) {
+        Get.toNamed('/faculty-supervision');
       }
       if (_selectedNavbar == 3) {
         Get.toNamed('/student-lecture');
@@ -326,7 +326,7 @@ class _FacultyEventSeminarState extends State<FacultyEventSeminar> {
       AsyncSnapshot<dynamic> snapshot, SeminarExaminer? userExaminer) {
     return ListView.builder(
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: rooms[index].applicant?.length ?? 0,
         itemBuilder: (context, i) {
           return FutureBuilder<dynamic>(
@@ -350,8 +350,10 @@ class _FacultyEventSeminarState extends State<FacultyEventSeminar> {
                       child: InkWell(
                         splashColor: Colors.lightBlue[100],
                         onTap: () {
-                          applicantDetailModal(
-                              context, research, room, applicant, userExaminer);
+                          if (true) {
+                            applicantDetailModal(context, research, room,
+                                applicant, userExaminer);
+                          }
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -373,7 +375,9 @@ class _FacultyEventSeminarState extends State<FacultyEventSeminar> {
                                             color: Color(0xff3A4856))),
                                   ),
                                   Text(
-                                      "${userExaminer?.getApplicantScore(applicant.id) ?? 'Mark'}",
+                                      (userExaminer == null)
+                                          ? ""
+                                          : "${userExaminer.getApplicantScore(applicant.id) ?? 'Mark'}",
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontFamily: 'OpenSans',
@@ -841,90 +845,102 @@ class _FacultyEventSeminarState extends State<FacultyEventSeminar> {
                         ),
                       ),
                     ),
-                    Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Your Mark ",
-                              style: const TextStyle(
-                                  color: Color(0xff3A4856),
-                                  fontSize: 14,
-                                  fontFamily: 'OpenSans'),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 4, vertical: 2),
-                              decoration: BoxDecoration(
-                                  color: Colors.red[100],
-                                  borderRadius: BorderRadius.circular(8.0)),
-                              child: InkWell(
-                                child: Text(
-                                  "${userExaminer?.getApplicantScore(applicant.id) ?? 'Unmarked'}",
-                                  style: const TextStyle(
-                                      color: Color.fromARGB(255, 37, 45, 54),
-                                      fontSize: 20,
-                                      fontFamily: 'OpenSans',
-                                      fontWeight: FontWeight.bold),
+                    (research.isSupervisor(userC.getId()) ||
+                            room.getExaminerByUser(userC.getId()) != null)
+                        ? Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Your Mark ",
+                                  style: TextStyle(
+                                      color: Color(0xff3A4856),
+                                      fontSize: 14,
+                                      fontFamily: 'OpenSans'),
                                 ),
-                                onTap: () {
-                                  if (room.getExaminerPresence(userC.getId())) {
-                                    inputMarkModal(userExaminer
-                                        ?.getApplicantScoreId(applicant.id));
-                                  } else {
-                                    if (!Get.isSnackbarOpen) {
-                                      Get.showSnackbar(const GetSnackBar(
-                                        message:
-                                            "You must be presence before input mark",
-                                        duration: Duration(seconds: 2),
-                                        icon: Icon(
-                                          Icons.warning_rounded,
-                                          color: Colors.white,
-                                        ),
-                                      ));
-                                    }
-                                  }
-                                },
-                              ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 4, vertical: 2),
+                                  decoration: BoxDecoration(
+                                      color: Colors.red[100],
+                                      borderRadius: BorderRadius.circular(8.0)),
+                                  child: InkWell(
+                                    child: Text(
+                                      "${userExaminer?.getApplicantScore(applicant.id) ?? 'Unmarked'}",
+                                      style: const TextStyle(
+                                          color:
+                                              Color.fromARGB(255, 37, 45, 54),
+                                          fontSize: 20,
+                                          fontFamily: 'OpenSans',
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    onTap: () {
+                                      if (room
+                                          .getExaminerPresence(userC.getId())) {
+                                        inputMarkModal(
+                                            userExaminer?.getApplicantScoreId(
+                                                applicant.id));
+                                      } else {
+                                        if (!Get.isSnackbarOpen) {
+                                          Get.showSnackbar(const GetSnackBar(
+                                            message:
+                                                "You must be presence before input mark",
+                                            duration: Duration(seconds: 2),
+                                            icon: Icon(
+                                              Icons.warning_rounded,
+                                              color: Colors.white,
+                                            ),
+                                          ));
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ))
+                        : Container(),
+                    (research.isSupervisor(userC.getId()) ||
+                            room.getExaminerByUser(userC.getId()) != null)
+                        ? ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                primary:
+                                    (room.getExaminerPresence(userC.getId()))
+                                        ? Colors.redAccent
+                                        : Colors.grey,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15))),
+                            child: Text(
+                              (userExaminer?.getApplicantScore(applicant.id) ==
+                                      null)
+                                  ? 'Input Mark'
+                                  : 'Change Mark',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'OpenSans',
+                                  fontWeight: FontWeight.bold),
                             ),
-                          ],
-                        )),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: (room.getExaminerPresence(userC.getId()))
-                              ? Colors.redAccent
-                              : Colors.grey,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15))),
-                      child: Text(
-                        (userExaminer?.getApplicantScore(applicant.id) == null)
-                            ? 'Input Mark'
-                            : 'Change Mark',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'OpenSans',
-                            fontWeight: FontWeight.bold),
-                      ),
-                      onPressed: () {
-                        if (room.getExaminerPresence(userC.getId())) {
-                          inputMarkModal(
-                              userExaminer?.getApplicantScoreId(applicant.id));
-                        } else {
-                          if (!Get.isSnackbarOpen) {
-                            Get.showSnackbar(const GetSnackBar(
-                              message: "You must be presence before input mark",
-                              duration: Duration(seconds: 2),
-                              icon: Icon(
-                                Icons.warning_rounded,
-                                color: Colors.white,
-                              ),
-                            ));
-                          }
-                        }
-                      },
-                    ),
+                            onPressed: () {
+                              if (room.getExaminerPresence(userC.getId())) {
+                                inputMarkModal(userExaminer
+                                    ?.getApplicantScoreId(applicant.id));
+                              } else {
+                                if (!Get.isSnackbarOpen) {
+                                  Get.showSnackbar(const GetSnackBar(
+                                    message:
+                                        "You must be presence before input mark",
+                                    duration: Duration(seconds: 2),
+                                    icon: Icon(
+                                      Icons.warning_rounded,
+                                      color: Colors.white,
+                                    ),
+                                  ));
+                                }
+                              }
+                            },
+                          )
+                        : Container(),
                   ],
                 ),
               ),

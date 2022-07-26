@@ -8,6 +8,7 @@ import 'package:arsys/student/models/seminar_examiner.dart';
 class EventApplicant {
   int id = -1;
   int researchId = -1;
+  int eventId = -1;
   Event? event;
   Research? research;
   Space? space;
@@ -17,6 +18,7 @@ class EventApplicant {
   EventApplicant.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     researchId = json['research_id'];
+    eventId = json['event_id'];
     if (json['event'] != null) {
       event = Event.fromJson(json['event']);
     }
@@ -91,6 +93,38 @@ class EventApplicant {
       }
     }
     return code;
+  }
+
+  bool isExaminer(int id) {
+    for (Examiner ex in examiner!) {
+      if (ex.examinerId == id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  List<bool>? getExaminerDefensePresence() {
+    var presences = List<bool>.empty(growable: true);
+    if (examiner != null) {
+      for (Examiner ex in examiner!) {
+        presences.add(ex.presence);
+      }
+    }
+    return presences;
+  }
+
+  DefenseExaminer? getExaminerByUser(int facultyId) {
+    var result;
+    if (examiner != null && examiner != []) {
+      for (var ex in examiner!) {
+        if (ex.examinerId == facultyId) {
+          result = ex;
+          return result;
+        }
+      }
+    }
+    return result;
   }
 
   // String getSupervisorCode() {

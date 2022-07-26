@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:arsys/controllers/user_controller.dart';
+import 'package:arsys/models/role.dart';
 import 'package:arsys/student/controllers/lecture_controller.dart';
 import 'package:arsys/views/appbar.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ class AllLecture extends StatefulWidget {
 
 class _AllLectureState extends State<AllLecture> {
   final lectureC = Get.find<LectureController>();
+  final userC = Get.find<UserController>();
   TextEditingController searchController = TextEditingController();
 
   String? semester = '';
@@ -30,7 +33,6 @@ class _AllLectureState extends State<AllLecture> {
 
   @override
   void initState() {
-    lectureC.allLecture();
     super.initState();
   }
 
@@ -39,16 +41,25 @@ class _AllLectureState extends State<AllLecture> {
     setState(() {
       _selectedNavbar = index;
       if (_selectedNavbar == 0) {
-        Get.toNamed('/student-home');
+        if (userC.user.getRole() == Role.student.value) {
+          Get.toNamed('/student-home');
+        } else {
+          Get.toNamed('/faculty-home');
+        }
       }
       if (_selectedNavbar == 1) {
-        Get.toNamed('/student-research');
+        if (userC.user.getRole() == Role.student.value) {
+          Get.toNamed('/student-research');
+        } else {
+          Get.toNamed('/faculty-supervision');
+        }
       }
       if (_selectedNavbar == 2) {
-        Get.toNamed('/student-event');
-      }
-      if (_selectedNavbar == 3) {
-        Get.toNamed('/student-lecture');
+        if (userC.user.getRole() == Role.student.value) {
+          Get.toNamed('/student-event');
+        } else {
+          Get.toNamed('/faculty-event');
+        }
       }
     });
   }
@@ -63,7 +74,7 @@ class _AllLectureState extends State<AllLecture> {
           : RefreshIndicator(
               displacement: 40,
               edgeOffset: 10,
-              onRefresh: refreshResearch,
+              onRefresh: refreshAllLecture,
               child: SafeArea(
                 child: Container(
                   padding: EdgeInsets.fromLTRB(15, 10, 5, 5),
@@ -77,9 +88,9 @@ class _AllLectureState extends State<AllLecture> {
                           children: [
                             Flexible(
                               child: Container(
-                                margin: EdgeInsets.fromLTRB(8, 0, 0, 5),
+                                margin: const EdgeInsets.fromLTRB(8, 0, 0, 5),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(
+                                  borderRadius: const BorderRadius.all(
                                     Radius.circular(50),
                                   ),
                                   boxShadow: [
@@ -109,9 +120,9 @@ class _AllLectureState extends State<AllLecture> {
                                             searchController.clear();
                                           });
                                         },
-                                        icon: Icon(Icons.clear),
+                                        icon: const Icon(Icons.clear),
                                       ),
-                                      border: OutlineInputBorder(
+                                      border: const OutlineInputBorder(
                                           borderSide: BorderSide.none,
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(50))),
@@ -151,7 +162,7 @@ class _AllLectureState extends State<AllLecture> {
                                                             MainAxisAlignment
                                                                 .spaceBetween,
                                                         children: [
-                                                          Text(
+                                                          const Text(
                                                             'Filter',
                                                             style: TextStyle(
                                                                 color: Color(
@@ -173,14 +184,14 @@ class _AllLectureState extends State<AllLecture> {
                                                                 }
                                                               });
                                                             },
-                                                            icon: Icon(Icons
+                                                            icon: const Icon(Icons
                                                                 .refresh_rounded),
                                                             color: Colors
                                                                 .lightBlueAccent,
                                                           )
                                                         ],
                                                       ),
-                                                      Text(
+                                                      const Text(
                                                         'Day',
                                                         style: TextStyle(
                                                             color: Color(
@@ -202,7 +213,7 @@ class _AllLectureState extends State<AllLecture> {
                                                                     BorderRadius
                                                                         .circular(
                                                                             15))),
-                                                        child: Text(
+                                                        child: const Text(
                                                           "Set",
                                                           style: TextStyle(
                                                               color:
@@ -358,12 +369,12 @@ class _AllLectureState extends State<AllLecture> {
                         child: FutureBuilder<dynamic>(
                             future: lectureC.allLecture(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
+                              if (snapshot.connectionState !=
+                                  ConnectionState.done) {
                                 return Center(
                                   child: CircularProgressIndicator(),
                                 );
-                              } else if (snapshot.data.length == 0) {
+                              } else if (!snapshot.hasData) {
                                 return Expanded(
                                     child: Center(child: Text('No Lecture')));
                               } else {
@@ -905,11 +916,12 @@ class _AllLectureState extends State<AllLecture> {
     );
   }
 
-  Future refreshResearch() async {
-    lectureC.lectures.clear();
-    lectureC.allLecture();
+  Future refreshAllLecture() async {
     // await Future.delayed(Duration(seconds: 2));
-    setState(() {});
+    setState(() {
+      lectureC.lectures.clear();
+      lectureC.allLecture();
+    });
   }
 
   // void logout() async {
